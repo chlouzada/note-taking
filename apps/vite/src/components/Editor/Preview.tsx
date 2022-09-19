@@ -21,7 +21,7 @@ export function Preview() {
   return (
     <div
       dangerouslySetInnerHTML={{ __html: html }}
-      className="md:block w-1/2"
+      className="bg-red-200 md:block w-1/2"
     />
   );
 }

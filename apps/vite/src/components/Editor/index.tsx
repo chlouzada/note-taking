@@ -38,7 +38,7 @@ export function Editor() {
   };
 
   return (
-    <div className="flex flex-col flex-grow w-full">
+    <div className="flex flex-col flex-grow w-full h-full">
       <EditorContext.Provider value={value}>
         <Toolbar />
         <div className="flex flex-grow w-full">

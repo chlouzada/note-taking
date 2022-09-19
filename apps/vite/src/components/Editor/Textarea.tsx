@@ -74,7 +74,7 @@ export function Textarea() {
   return (
     <textarea
       ref={editor.ref}
-      className={`outline-none resize-none ${classNames({
+      className={`bg-red-100 outline-none resize-none ${classNames({
         grow: !editor.preview,
         "hidden md:block w-1/2": editor.preview,
       })}`}

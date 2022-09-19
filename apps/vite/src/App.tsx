@@ -1,13 +1,15 @@
 import { Editor } from "./components/Editor";
 import { Header } from "./components/Header";
+import { Navigation } from "./components/Navigation";
 
 function App() {
   return (
     <>
       <Header />
-      <main className="flex flex-col min-h-full">
+      <div className="flex flex-row h-full">
+        <Navigation />
         <Editor />
-      </main>
+      </div>
     </>
   );
 }
