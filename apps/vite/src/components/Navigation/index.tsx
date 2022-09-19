@@ -1,5 +1,10 @@
+import { trpc } from "../../utils/trpc";
+
 export const NotesView = () => {
-  return <div className="w-1/2 bg-gray-200">Notes</div>;
+  const { data } = trpc.notebook.list.useQuery();
+  return (
+    <div className="w-1/2 bg-gray-200">Notes {data?.map((d) => <p>{d.title}</p>)}</div>
+  );
 };
 
 export const CategoryView = () => {

@@ -1,6 +1,7 @@
 import { Editor } from "./components/Editor";
 import { Header } from "./components/Header";
 import { Navigation } from "./components/Navigation";
+import { TRPCProvider } from "./utils/trpc";
 
 function App() {
   return (
@@ -14,4 +15,10 @@ function App() {
   );
 }
 
-export default App;
+const WithTRPC = () => (
+  <TRPCProvider>
+    <App />
+  </TRPCProvider>
+);
+
+export default WithTRPC;

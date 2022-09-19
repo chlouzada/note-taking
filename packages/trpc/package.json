@@ -6,7 +6,6 @@
   "dependencies": {
     "@trpc/server": "^10.0.0-proxy-beta.0",
     "@trpc/client": "^10.0.0-proxy-beta.0",
-    "superjson": "^1.9.1",
     "zod": "^3.18.0"
   },
   "devDependencies": {
