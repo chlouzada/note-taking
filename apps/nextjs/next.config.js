@@ -1,7 +1,12 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+const withTM = require("next-transpile-modules")
+
+function defineNextConfig(config) {
+  return config;
 }
 
-module.exports = nextConfig
+module.exports = withTM(["@note-taking/trpc"])(
+  defineNextConfig({
+    reactStrictMode: true,
+    swcMinify: true,
+  })
+);

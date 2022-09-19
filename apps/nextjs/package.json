@@ -9,10 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@note-taking/trpc": "*",
     "next": "12.3.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "@note-taking/trpc": "*"
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
     "@types/node": "18.7.18",
@@ -20,6 +20,7 @@
     "@types/react-dom": "18.0.6",
     "eslint": "8.23.1",
     "eslint-config-next": "12.3.0",
+    "next-transpile-modules": "^9.0.0",
     "typescript": "4.8.3"
   }
 }
