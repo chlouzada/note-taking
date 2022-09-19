@@ -5,6 +5,12 @@ import { useState } from "react";
 
 export const trpc = createTRPCReact<AppRouter>();
 
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_ENV === "development")
+    return "http://localhost:4321/api/trpc";
+  else return import.meta.env.VITE_NEXTJS_URL + "/api/trpc";
+};
+
 export const TRPCProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -13,7 +19,7 @@ export const TRPCProvider: React.FC<{ children: React.ReactNode }> = ({
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "http://localhost:4321/api/trpc",
+          url: getBaseUrl(),
           fetch(url, options) {
             return fetch(url, {
               ...options,
