@@ -16,8 +16,7 @@ export function Editor() {
   const ref = useRef(null);
   let timeoutId: NodeJS.Timeout;
 
-  const { data } = trpc.notebook.all.useQuery();
-  const note = data?.flatMap((n) => n.notes).find((n) => n.id === noteId);
+  const { data: note } = trpc.note.get.useQuery(noteId!, { enabled: !!noteId });
 
   const update = trpc.note.update.useMutation();
 
@@ -28,11 +27,13 @@ export function Editor() {
     html: string;
     text: string;
   }) => {
+    if (!note) return;
+
     clearTimeout(timeoutId);
 
     timeoutId = setTimeout(() => {
       const data = update.mutate({
-        id: noteId!,
+        id: note.id,
         data: {
           content: text,
         },
@@ -55,7 +56,7 @@ export function Editor() {
           style={{ height }}
           renderHTML={(text: string) => mdParser.render(text)}
           onChange={handleEditorChange}
-          defaultValue={note.content || ""}
+          defaultValue={note.content}
         />
       )}
     </div>

@@ -21,10 +21,10 @@ function App() {
 }
 
 const SelectionContext = createContext<{
-  noteId?: number;
-  setNoteId: (id?: number) => void;
-  notebookId?: number;
-  setNotebookId: (id?: number) => void;
+  noteId?: string;
+  setNoteId: (id?: string) => void;
+  notebookId?: string;
+  setNotebookId: (id?: string) => void;
 }>(null!);
 
 export const useSelection = () => {

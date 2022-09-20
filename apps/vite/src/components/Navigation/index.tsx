@@ -1,6 +1,6 @@
 import { AppRouter } from "@note-taking/trpc";
 import { inferProcedureOutput } from "@trpc/server";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelection } from "../../App";
 import { trpc } from "../../utils/trpc";
 
@@ -12,21 +12,21 @@ export type Note = inferProcedureOutput<
 >[number]["notes"][number];
 
 export const NotesView = ({ notes }: { notes?: Note[] }) => {
-  const { notebookId, noteId, setNoteId } = useSelection();
-
-  let data: Note[] = [];
+  const { noteId, setNoteId, notebookId } = useSelection();
+  const [data, setData] = useState<Note[]>([]);
 
   useEffect(() => {
     const filtered = notes?.filter((note) => note.notebookId === notebookId);
+    setData(filtered ?? []);
     setNoteId(filtered?.[0]?.id);
-    data = filtered || [];
   }, [notebookId]);
 
   return (
     <div className="w-1/2 bg-gray-200">
       <ul className="list-none">
-        {data.map((n) => (
+        {data?.map((n) => (
           <li
+            key={n.id}
             className={`list-none ${
               noteId === n.id ? "bg-blue-400" : "bg-blue-200"
             } p-2`}
@@ -43,27 +43,21 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
 export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
   const { setNotebookId, notebookId, setNoteId } = useSelection();
 
-  const first = notebooks?.[0];
-
-  if (!notebooks) setNotebookId(first?.id);
-
   return (
     <div className="w-1/2 bg-blue-200">
       <p>Categories</p>
       <div>
         <p>Notebooks</p>
         <ul>
-          {notebooks?.map((nb) => (
+          {notebooks?.map((notebook) => (
             <li
+              key={notebook.id}
               className={`list-none ${
-                nb.id === notebookId ? "bg-blue-400" : "bg-blue-200"
+                notebook.id === notebookId ? "bg-blue-400" : "bg-blue-200"
               } p-2`}
-              onClick={() => {
-                setNotebookId(nb.id);
-                setNoteId(undefined);
-              }}
+              onClick={() => setNotebookId(notebook.id)}
             >
-              {nb.title}
+              {notebook.title}
             </li>
           ))}
         </ul>
@@ -73,7 +67,14 @@ export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
 };
 
 export const Navigation = () => {
+  const { setNotebookId, notebookId, noteId, setNoteId } = useSelection();
+
   const { data } = trpc.notebook.all.useQuery();
+
+  useEffect(() => {
+    if (!notebookId) setNotebookId(data?.[0].id);
+    if (!noteId) setNoteId(data?.[0].notes[0]?.id);
+  }, [data]);
 
   return (
     <div className="col-start-1 col-end-3">

@@ -3,7 +3,7 @@ import { t } from "../trpc";
 
 export const notebookRouter = t.router({
   all: t.procedure.query(async ({ ctx }) => {
-    const notebooks = ctx.prisma.notebook.findMany({
+    const notebooks = await ctx.prisma.notebook.findMany({
       include: {
         notes: {
           select: {
@@ -11,10 +11,35 @@ export const notebookRouter = t.router({
             title: true,
             createdAt: true,
             updatedAt: true,
+            notebookId: true,
           },
         },
       },
     });
+
+    if (notebooks.length === 0) {
+      const notebook = await ctx.prisma.notebook.create({
+        data: {
+          title: "Default",
+        },
+      });
+
+      const note = await ctx.prisma.note.create({
+        data: {
+          title: "Welcome to Note Taking!",
+          content:
+            "This is your first note. You can edit it by clicking on it.",
+          notebook: {
+            connect: {
+              id: notebook.id,
+            },
+          },
+        },
+      });
+
+      throw new Error("retry");
+    }
+
     return notebooks;
   }),
 
