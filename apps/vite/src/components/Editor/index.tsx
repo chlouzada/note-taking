@@ -5,47 +5,24 @@ import React, {
   useContext,
   useState,
 } from "react";
-import { Preview } from "./Preview";
-import { Textarea } from "./Textarea";
-import { Toolbar } from "./Toolbar";
+import MarkdownIt from "markdown-it";
+import MdEditor from "react-markdown-editor-lite";
 
-type EditorContextType = {
-  text: string;
-  setText: React.Dispatch<React.SetStateAction<string>>;
-  preview: boolean;
-  togglePreview: () => void;
-  ref: RefObject<HTMLTextAreaElement>;
-};
+import "react-markdown-editor-lite/lib/index.css";
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const EditorContext = createContext<EditorContextType>(null!);
+const mdParser = new MarkdownIt(/* Markdown-it options */);
 
-export const useEditor = () => useContext(EditorContext);
+function handleEditorChange({ html, text }: { html: string; text: string }) {
+  console.log("handleEditorChange", html, text);
+}
 
 export function Editor() {
-  const editorRef = createRef<HTMLTextAreaElement>();
-  const [text, setText] = useState("");
-  const [preview, _setPreview] = useState(false);
-
-  const togglePreview = () => _setPreview(!preview);
-
-  const value = {
-    text,
-    setText,
-    preview,
-    togglePreview,
-    ref: editorRef,
-  };
-
   return (
-    <div className="flex flex-col flex-grow w-full h-full">
-      <EditorContext.Provider value={value}>
-        <Toolbar />
-        <div className="flex flex-grow w-full">
-          <Textarea />
-          <Preview />
-        </div>
-      </EditorContext.Provider>
-    </div>
+    <MdEditor
+      // style={{ height: "500px" }}
+      className="w-full"
+      renderHTML={(text) => mdParser.render(text)}
+      onChange={handleEditorChange}
+    />
   );
 }

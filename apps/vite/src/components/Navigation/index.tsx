@@ -13,7 +13,7 @@ export const CategoryView = () => {
 
 export const Navigation = () => {
   return (
-    <div className="flex w-[42rem]">
+    <div className="flex w-[36rem]">
       <CategoryView />
       <NotesView />
     </div>
