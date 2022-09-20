@@ -32,8 +32,8 @@ export const useSelection = () => {
 };
 
 const WithProviders = () => {
-  const [notebookId, setNotebookId] = useState<number>();
-  const [noteId, setNoteId] = useState<number>();
+  const [notebookId, setNotebookId] = useState<string>();
+  const [noteId, setNoteId] = useState<string>();
 
   const value = {
     notebookId,

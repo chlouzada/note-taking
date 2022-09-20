@@ -1,9 +1,8 @@
-// src/pages/api/trpc/[trpc].ts
 import { createNextApiHandler } from "@trpc/server/adapters/next";
 import { appRouter, createContext } from "@note-taking/trpc";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-// export API handler
+// eslint-disable-next-line import/no-anonymous-default-export
 export default (req: NextApiRequest, res: NextApiResponse) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Request-Method", "*");
