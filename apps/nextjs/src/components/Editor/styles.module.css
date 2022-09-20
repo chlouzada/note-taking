@@ -1,0 +1,11 @@
+.custom-html-style ul {
+  list-style: disc !important;
+}
+
+.custom-html-style ol {
+  list-style: decimal !important;
+}
+
+.custom-html-style h1 {
+ margin: 16px 0 !important;
+}
