@@ -3,7 +3,12 @@ import { trpc } from "../../utils/trpc";
 export const NotesView = () => {
   const { data } = trpc.notebook.list.useQuery();
   return (
-    <div className="w-1/2 bg-gray-200">Notes {data?.map((d) => <p>{d.title}</p>)}</div>
+    <div className="w-1/2 bg-gray-200">
+      Notes{" "}
+      {data?.map((d) => (
+        <p>{d.title}</p>
+      ))}
+    </div>
   );
 };
 
@@ -13,9 +18,11 @@ export const CategoryView = () => {
 
 export const Navigation = () => {
   return (
-    <div className="flex w-[36rem]">
-      <CategoryView />
-      <NotesView />
+    <div className="col-start-1 col-end-3">
+      <div className="flex h-full">
+        <CategoryView />
+        <NotesView />
+      </div>
     </div>
   );
 };

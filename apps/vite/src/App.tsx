@@ -1,26 +1,30 @@
-import { Editor } from "./components/Editor";
-import { Footer } from "./components/Footer";
-import { Header } from "./components/Header";
-import { Navigation } from "./components/Navigation";
 import { TRPCProvider } from "./utils/trpc";
+import { MantineProvider } from "@mantine/core";
+
+import AppLayout from "./layouts/AppLayout";
+
+import { Editor } from "./components/Editor";
+import { Navigation } from "./components/Navigation";
 
 function App() {
   return (
-    <>
-      <Header />
-      <main className="flex flex-row grow overflow-auto" >
-        <Navigation />
-        <Editor />
+    <AppLayout>
+      <main className="h-full">
+        <div className="grid grid-cols-7 min-h-full overflow-auto">
+          <Navigation />
+          <Editor />
+        </div>
       </main>
-      <Footer />
-    </>
+    </AppLayout>
   );
 }
 
-const WithTRPC = () => (
+const WithProviders = () => (
   <TRPCProvider>
-    <App />
+    <MantineProvider >
+      <App />
+    </MantineProvider>
   </TRPCProvider>
 );
 
-export default WithTRPC;
+export default WithProviders;
