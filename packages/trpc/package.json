@@ -4,6 +4,7 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "dependencies": {
+    "@note-taking/db": "*",
     "@trpc/server": "^10.0.0-proxy-beta.0",
     "@trpc/client": "^10.0.0-proxy-beta.0",
     "zod": "^3.18.0"

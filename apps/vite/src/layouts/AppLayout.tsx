@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   AppShell,
   Navbar,
@@ -9,30 +9,41 @@ import {
   MediaQuery,
   Burger,
   useMantineTheme,
-} from '@mantine/core';
-import { Footer } from '../components/Footer';
-import { Header } from '../components/Header';
+} from "@mantine/core";
+import { Footer } from "../components/Footer";
+import { Header } from "../components/Header";
 
-export default function AppLayout({children}: {children: React.ReactNode}) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const theme = useMantineTheme();
   const [opened, setOpened] = useState(false);
+
+  const headerHeight = 52;
+  const footerHeight = 24;
+
   return (
     <AppShell
+      className="px-0"
       styles={{
         main: {
-          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
+          background:
+            theme.colorScheme === "dark"
+              ? theme.colors.dark[8]
+              : theme.colors.gray[0],
+          paddingLeft: 0,
+          paddingRight: 0,
+          paddingTop: headerHeight,
+          paddingBottom: footerHeight,
         },
       }}
-      
-      footer={
-        <MFooter height={60} p="md">
-          <Footer/>
-        </MFooter>
-      }
       header={
-        <MHeader fixed height={70} p="md">
-          <Header/>
+        <MHeader fixed height={headerHeight} className="border-b-0">
+          <Header />
         </MHeader>
+      }
+      footer={
+        <MFooter height={footerHeight} className="bg-gray-700">
+          <Footer />
+        </MFooter>
       }
     >
       {children}

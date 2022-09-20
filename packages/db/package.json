@@ -1,0 +1,20 @@
+{
+  "name": "@note-taking/db",
+  "version": "0.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "scripts": {
+    "dev": "prisma studio --port 4322", 
+    "push": "prisma db push",
+    "generate": "prisma db generate",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.2.1"
+  },
+  "devDependencies": {
+    "prisma": "^4.2.1",
+    "typescript": "4.7.4"
+  }
+}

@@ -5,3 +5,7 @@ ul {
 ol {
   list-style: decimal !important;
 }
+
+h1 {
+ margin: 16px 0 !important;
+}
