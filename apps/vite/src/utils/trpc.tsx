@@ -7,7 +7,7 @@ export const trpc = createTRPCReact<AppRouter>();
 
 const getBaseUrl = () => {
   if (import.meta.env.VITE_ENV === "development")
-    return "http://localhost:4321/api/trpc";
+    return "http://localhost:3000/api/trpc";
   else return import.meta.env.VITE_NEXTJS_URL + "/api/trpc";
 };
 
