@@ -18,6 +18,7 @@ export const serverSchema = z.object({
 export const clientSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string(),
   NEXT_PUBLIC_SUPABASE_KEY: z.string(),
+  NEXT_PUBLIC_SUPABASE_REF: z.string(),
 });
 
 /**
@@ -29,4 +30,5 @@ export const clientSchema = z.object({
 export const clientEnv = {
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_KEY: process.env.NEXT_PUBLIC_SUPABASE_KEY,
+  NEXT_PUBLIC_SUPABASE_REF: process.env.NEXT_PUBLIC_SUPABASE_REF,
 };

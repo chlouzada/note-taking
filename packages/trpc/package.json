@@ -5,11 +5,13 @@
   "types": "./src/index.ts",
   "dependencies": {
     "@note-taking/db": "*",
-    "@trpc/server": "^10.0.0-proxy-beta.0",
     "@trpc/client": "^10.0.0-proxy-beta.0",
+    "@trpc/server": "^10.0.0-proxy-beta.0",
+    "jsonwebtoken": "^8.5.1",
     "zod": "^3.18.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.9",
     "typescript": "4.8.2"
   }
 }
