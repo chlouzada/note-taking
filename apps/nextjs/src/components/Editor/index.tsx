@@ -36,6 +36,7 @@ export function Editor() {
   }, []);
 
   useEffect(() => {
+    if (!noteId) return;
     update.mutate({ id: noteId!, data: { content: debounced } });
   }, [debounced]);
 
