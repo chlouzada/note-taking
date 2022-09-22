@@ -23,7 +23,6 @@
     "@trpc/react": "10.0.0-proxy-beta.0",
     "@trpc/server": "10.0.0-proxy-beta.0",
     "classnames": "^2.3.2",
-    "daisyui": "^2.30.0",
     "markdown-it": "^13.0.1",
     "next": "12.2.5",
     "next-themes": "^0.2.1",
