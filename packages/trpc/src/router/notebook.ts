@@ -1,9 +1,12 @@
 import { z } from "zod";
-import { t } from "../trpc";
+import { authedProcedure, t } from "../trpc";
 
 export const notebookRouter = t.router({
-  all: t.procedure.query(async ({ ctx }) => {
+  all: authedProcedure.query(async ({ ctx }) => {
     const notebooks = await ctx.prisma.notebook.findMany({
+      where: {
+        userId: ctx.session.id,
+      },
       include: {
         notes: {
           select: {
@@ -21,6 +24,11 @@ export const notebookRouter = t.router({
       const notebook = await ctx.prisma.notebook.create({
         data: {
           title: "Default",
+          user: {
+            connect: {
+              id: ctx.session.id,
+            },
+          },
         },
       });
 
@@ -34,6 +42,11 @@ export const notebookRouter = t.router({
               id: notebook.id,
             },
           },
+          user: {
+            connect: {
+              id: ctx.session.id,
+            },
+          },
         },
       });
 
@@ -43,15 +56,22 @@ export const notebookRouter = t.router({
     return notebooks;
   }),
 
-  create: t.procedure
+  create: authedProcedure
     .input(z.object({ title: z.string(), description: z.string().nullish() }))
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.notebook.create({
-        data: input,
+      return ctx.prisma.notebook.create({
+        data: {
+          ...input,
+          user: {
+            connect: {
+              id: ctx.session.id,
+            },
+          },
+        },
       });
     }),
 
-  update: t.procedure
+  update: authedProcedure
     .input(
       z.object({
         id: z.string(),
@@ -63,10 +83,14 @@ export const notebookRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const { id, data } = input;
-      const notebook = await ctx.prisma.notebook.update({
+
+      const notebook = await ctx.prisma.notebook.findFirstOrThrow({
         where: { id },
+      });
+
+      return ctx.prisma.notebook.update({
+        where: { id: notebook.id },
         data,
       });
-      return notebook;
     }),
 });
