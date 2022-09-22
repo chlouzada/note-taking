@@ -10,6 +10,8 @@ const Home: NextPage = () => {
   const { session, signOut } = useSupabase();
   const router = useRouter();
 
+  console.log(session)
+
   return (
     <>
       <Head>

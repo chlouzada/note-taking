@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { Editor } from "../components/Editor";
 import { Navigation } from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -15,18 +15,7 @@ export const useSelection = () => {
   return useContext(SelectionContext);
 };
 
-function EditorPage() {
-  return (
-    <div className="h-full">
-      <div className="grid grid-cols-7 min-h-full overflow-auto">
-        <Navigation />
-        <Editor />
-      </div>
-    </div>
-  );
-}
-
-export default function WithProviders({
+export default function EditorPage({
   children,
 }: {
   children: React.ReactNode;

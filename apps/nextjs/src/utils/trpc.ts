@@ -2,11 +2,25 @@
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 import type { AppRouter } from "@note-taking/trpc";
+import { clientEnv } from "../env/schema.mjs";
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return ""; // browser should use relative url
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+};
+
+const getAuthorization = () => {
+  if (typeof window === "undefined") return "";
+
+  const ls = localStorage.getItem(
+    `sb-${clientEnv.NEXT_PUBLIC_SUPABASE_REF}-auth-token`
+  );
+  if (!ls) return "";
+
+  const data = JSON.parse(ls);
+
+  return data?.access_token ?? "";
 };
 
 export const trpc = createTRPCNext<AppRouter>({
@@ -25,6 +39,9 @@ export const trpc = createTRPCNext<AppRouter>({
               ...options,
               credentials: "omit",
             });
+          },
+          headers: {
+            authorization: getAuthorization(),
           },
         }),
       ],

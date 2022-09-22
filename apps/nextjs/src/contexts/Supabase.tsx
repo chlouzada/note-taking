@@ -39,7 +39,8 @@ export default function SupabaseProvider({
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (mounted && session) setSession(session);
+      if (mounted && session) return setSession(session);
+      // document.cookie = "supabase.access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     }
 
     getInitialSession();

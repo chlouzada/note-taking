@@ -6,20 +6,20 @@ import classNames from "classnames";
 import { useSupabase } from "../contexts/Supabase";
 import { useRouter } from "next/router";
 import { Button, Divider, TextInput } from "@mantine/core";
+import { useEffect } from "react";
 
 export default function SignInPage() {
   const router = useRouter();
-  const { signIn } = useSupabase();
+  const { signIn, session } = useSupabase();
   const { register, handleSubmit } = useForm<{ email: string }>();
 
   const submit = useMutation(handleSubmit(signIn));
 
+  useEffect(() => {
+    if (session) router.push("/");
+  }, [session]);
+
   return (
-    // <div className="grid grid-cols-8 h-full">
-    //   <div className="col-start-1 col-end-9 md:col-end-6 lg:col-end-5 bg-black flex justify-center items-center">
-    //   </div>
-    //   <div className="hidden md:block md:col-start-6 lg:col-start-5 col-end-9 bg-gray-800 shadow-xl" />
-    // </div>
     <div className="flex h-full justify-center items-center bg-slate-800">
       <div className="bg-white rounded-md p-4 w-full md:w-3/5 lg:w-2/5 xl:w-1/5 m-2 flex flex-col gap-4">
         <h2 className="text-3xl font-bold pb-4">Welcome</h2>
