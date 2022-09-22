@@ -1,9 +1,8 @@
-import React from "react";
+import { Footer } from '@mantine/core'
+import React from 'react'
 
-export const Footer = ({ className }: { className?: string }) => {
+export default function index() {
   return (
-    <div
-      className={`footer p-3 bg-neutral text-neutral-content ${className}`}
-    ></div>
-  );
-};
+    <Footer height={28}> </Footer>
+  )
+}

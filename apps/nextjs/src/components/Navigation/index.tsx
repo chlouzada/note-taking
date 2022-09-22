@@ -1,7 +1,7 @@
 import { AppRouter } from "@note-taking/trpc";
 import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useState } from "react";
-import { useSelection } from "../../layouts/AppLayout";
+import { useSelection } from "../../pages/editor";
 import { trpc } from "../../utils/trpc";
 
 export type Notebook = inferProcedureOutput<

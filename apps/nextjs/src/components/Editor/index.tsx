@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "../../utils/trpc";
-import { useSelection } from "../../layouts/AppLayout";
+import { useSelection } from "../../pages/editor";
 import MarkdownIt from "markdown-it";
 import MdEditor from "react-markdown-editor-lite";
 
