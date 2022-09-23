@@ -1,11 +1,12 @@
 import { AppRouter } from "@note-taking/trpc";
 import { inferProcedureOutput } from "@trpc/server";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelection } from "../../pages/editor";
 import { trpc } from "../../utils/trpc";
 import { ActionIcon } from "@mantine/core";
 import { Note } from "tabler-icons-react";
 import { ArrowsSort } from "tabler-icons-react";
+import autoAnimate from "@formkit/auto-animate";
 
 export type NavigationProps = {
   data: inferProcedureOutput<AppRouter["notebook"]["all"]>;
@@ -21,6 +22,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const { noteId, setNoteId, notebookId } = useSelection();
   const [data, setData] = useState<Note[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
+  const parentRef = useRef(null);
 
   const create = trpc.note.create.useMutation({
     onSuccess: (data) => {
@@ -42,6 +44,14 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     setNoteId(filtered?.[0]?.id);
   }, [notebookId]);
 
+  useEffect(() => {
+    parentRef.current &&
+      autoAnimate(parentRef.current, {
+        duration: 200,
+        easing: "ease-in-out",
+      });
+  }, [parentRef]);
+
   const sorted = data?.sort((a, b) => {
     if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
     else return a.updatedAt < b.updatedAt ? 1 : -1;
@@ -60,7 +70,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
           <Note size={24} strokeWidth="1.5" color="black" />
         </ActionIcon>
       </div>
-      <ul className="list-none">
+      <ul className="list-none" ref={parentRef}>
         {sorted?.map((n) => (
           <li
             key={n.id}
