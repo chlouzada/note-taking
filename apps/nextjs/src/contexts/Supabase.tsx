@@ -1,4 +1,5 @@
 import { Session } from "@supabase/supabase-js";
+import { useRouter } from "next/router.js";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { clientEnv } from "../env/schema.mjs";
 import { supabase } from "../utils/supabase-client";
@@ -33,7 +34,9 @@ export default function SupabaseProvider({
   children: React.ReactNode;
 }) {
   const [session, _setSession] = useState<Session | null>(null);
-  const newUserMutation = trpc.user.create.useMutation();
+  const router = useRouter();
+
+  const userCreate = trpc.user.create.useMutation();
 
   const setSession = (session: Session | null) => {
     syncWithCookies(session);
@@ -57,6 +60,7 @@ export default function SupabaseProvider({
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
+    router.push("/");
   };
 
   useEffect(() => {
@@ -74,7 +78,7 @@ export default function SupabaseProvider({
       setSession(session);
 
       if (event == "SIGNED_IN" && session)
-        newUserMutation.mutate({
+        userCreate.mutate({
           // id: session.user.id,
           // email: session.user.email!,
           jwt: session.access_token,
