@@ -15,7 +15,7 @@ export const userRouter = t.router({
         process.env.JWT_SECRET!
       ) as SupabaseJwtPayload;
 
-      const user = await ctx.prisma.user.findFirst({
+      let user = await ctx.prisma.user.findFirst({
         where: {
           id: payload.sub,
         },
@@ -23,7 +23,7 @@ export const userRouter = t.router({
 
       if (user) return user;
 
-      await ctx.prisma.user.create({
+      user = await ctx.prisma.user.create({
         data: {
           id: payload.sub,
           email: payload.email,
@@ -41,7 +41,7 @@ export const userRouter = t.router({
         },
       });
 
-      ctx.prisma.note.create({
+      await ctx.prisma.note.create({
         data: {
           title: "Welcome to Note Taking!",
           content:
@@ -58,5 +58,7 @@ export const userRouter = t.router({
           },
         },
       });
+
+      return user;
     }),
 });
