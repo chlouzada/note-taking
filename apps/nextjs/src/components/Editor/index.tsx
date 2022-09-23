@@ -5,7 +5,6 @@ import MarkdownIt from "markdown-it";
 import MdEditor from "react-markdown-editor-lite";
 
 import "react-markdown-editor-lite/lib/index.css";
-import "./styles.module.css";
 import { LoadingOverlay } from "@mantine/core";
 
 const useDebounce = (value: any, delay: number) => {
