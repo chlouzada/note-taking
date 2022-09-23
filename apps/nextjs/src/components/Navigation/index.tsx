@@ -18,11 +18,22 @@ export type Note = inferProcedureOutput<
   AppRouter["notebook"]["all"]
 >[number]["notes"][number];
 
+const useListAnimation = () => {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current &&
+      autoAnimate(ref.current, {
+        duration: 125,
+      });
+  }, [ref]);
+  return ref;
+};
+
 export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const { noteId, setNoteId, notebookId } = useSelection();
   const [data, setData] = useState<Note[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
-  const parentRef = useRef(null);
+  const listAnimatedRef = useListAnimation();
 
   const create = trpc.note.create.useMutation({
     onSuccess: (data) => {
@@ -44,14 +55,6 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     setNoteId(filtered?.[0]?.id);
   }, [notebookId]);
 
-  useEffect(() => {
-    parentRef.current &&
-      autoAnimate(parentRef.current, {
-        duration: 200,
-        easing: "ease-in-out",
-      });
-  }, [parentRef]);
-
   const sorted = data?.sort((a, b) => {
     if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
     else return a.updatedAt < b.updatedAt ? 1 : -1;
@@ -70,7 +73,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
           <Note size={24} strokeWidth="1.5" color="black" />
         </ActionIcon>
       </div>
-      <ul className="list-none" ref={parentRef}>
+      <ul className="list-none" ref={listAnimatedRef}>
         {sorted?.map((n) => (
           <li
             key={n.id}
