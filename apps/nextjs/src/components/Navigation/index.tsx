@@ -104,7 +104,10 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
             className={`list-none flex justify-between items-center ${
               noteId === n.id ? "bg-blue-400" : "bg-blue-200"
             } p-2`}
-            onClick={() => setNoteId(n.id)}
+            onClick={(e) => {
+              if (e.target instanceof SVGElement) return;
+              setNoteId(n.id);
+            }}
           >
             <p>{n.title ?? "Untitled"}</p>
             <ActionIcon size={"xs"} onClick={() => deleteMutation.mutate(n.id)}>
