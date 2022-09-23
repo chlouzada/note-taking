@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-    id        String      @id
+    id        String   @id
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -33,7 +33,7 @@ model Notebook {
 
     notes Note[]
 
-    user   User @relation(fields: [userId], references: [id])
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String
 }
 
@@ -45,9 +45,9 @@ model Note {
     title   String
     content String
 
-    user   User @relation(fields: [userId], references: [id])
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String
 
-    notebook   Notebook @relation(fields: [notebookId], references: [id])
+    notebook   Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
     notebookId String
 }
