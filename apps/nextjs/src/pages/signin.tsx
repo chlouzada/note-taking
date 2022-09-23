@@ -10,10 +10,11 @@ import { useEffect } from "react";
 
 export default function SignInPage() {
   const router = useRouter();
-  const { signIn, session } = useSupabase();
+  const { signIn, session, signInWithGoogle } = useSupabase();
   const { register, handleSubmit } = useForm<{ email: string }>();
 
   const submit = useMutation(handleSubmit(signIn));
+  const google = useMutation(signInWithGoogle);
 
   useEffect(() => {
     if (session) router.push("/");
@@ -61,7 +62,10 @@ export default function SignInPage() {
           )}
         </form>
         <Divider />
-        <Button disabled className="btn btn-primary w-full">
+        <Button
+          onClick={() => google.mutate()}
+          className="btn btn-primary w-full"
+        >
           With Google
         </Button>
       </div>

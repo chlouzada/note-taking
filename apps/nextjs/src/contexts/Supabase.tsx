@@ -7,6 +7,7 @@ import { trpc } from "../utils/trpc";
 type SupabaseContext = {
   session: Session | null;
   signIn: ({ email }: { email: string }) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -46,6 +47,13 @@ export default function SupabaseProvider({
     if (error) throw error;
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+    if (error) throw error;
+  };
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
@@ -81,8 +89,9 @@ export default function SupabaseProvider({
 
   const value = {
     session,
-    signIn,
     signOut,
+    signIn,
+    signInWithGoogle,
   };
 
   return (
