@@ -3,7 +3,7 @@ import { authedProcedure, t } from "../trpc";
 
 export const notebookRouter = t.router({
   all: authedProcedure.query(async ({ ctx }) => {
-    const notebooks = await ctx.prisma.notebook.findMany({
+    return ctx.prisma.notebook.findMany({
       where: {
         userId: ctx.session.id,
       },
@@ -19,41 +19,6 @@ export const notebookRouter = t.router({
         },
       },
     });
-
-    if (notebooks.length === 0) {
-      const notebook = await ctx.prisma.notebook.create({
-        data: {
-          title: "Default",
-          user: {
-            connect: {
-              id: ctx.session.id,
-            },
-          },
-        },
-      });
-
-      const note = await ctx.prisma.note.create({
-        data: {
-          title: "Welcome to Note Taking!",
-          content:
-            "This is your first note. You can edit it by clicking on it.",
-          notebook: {
-            connect: {
-              id: notebook.id,
-            },
-          },
-          user: {
-            connect: {
-              id: ctx.session.id,
-            },
-          },
-        },
-      });
-
-      throw new Error("retry");
-    }
-
-    return notebooks;
   }),
 
   create: authedProcedure

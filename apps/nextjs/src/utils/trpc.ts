@@ -13,14 +13,17 @@ const getBaseUrl = () => {
 const getAuthorization = () => {
   if (typeof window === "undefined") return "";
 
-  const ls = localStorage.getItem(
-    `sb-${clientEnv.NEXT_PUBLIC_SUPABASE_REF}-auth-token`
-  );
-  if (!ls) return "";
+  const cookie = document.cookie
+    .split(";")
+    .find((c) =>
+      c
+        .trim()
+        .startsWith(`sb-${clientEnv.NEXT_PUBLIC_SUPABASE_REF}-access-token`)
+    );
 
-  const data = JSON.parse(ls);
+  const value = cookie?.split("=")[1];
 
-  return data?.access_token ?? "";
+  return value ?? "";
 };
 
 export const trpc = createTRPCNext<AppRouter>({

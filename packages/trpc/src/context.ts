@@ -2,7 +2,12 @@
 import * as trpc from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
 import { prisma } from "@note-taking/db";
-import { verify } from "jsonwebtoken";
+import { JwtPayload, verify } from "jsonwebtoken";
+
+export type SupabaseJwtPayload = JwtPayload & {
+  email: string;
+  sub: string;
+};
 
 type Session = {
   id: string;
@@ -34,11 +39,15 @@ export const createContext = async (
   const { req } = opts;
 
   const jwt = req.headers.authorization;
-  const payload = jwt ? verify(jwt, process.env.JWT_SECRET!) : null;
+
+  const payload = jwt
+    ? (verify(jwt, process.env.JWT_SECRET!) as SupabaseJwtPayload)
+    : null;
+
   const session = payload
     ? {
-        id: payload.sub as string,
-        email: (payload as any).email,
+        id: payload.sub,
+        email: payload.email,
       }
     : null;
 

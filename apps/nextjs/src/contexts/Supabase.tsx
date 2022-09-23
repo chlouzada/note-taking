@@ -2,6 +2,7 @@ import { Session } from "@supabase/supabase-js";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { clientEnv } from "../env/schema.mjs";
 import { supabase } from "../utils/supabase-client";
+import { trpc } from "../utils/trpc";
 
 type SupabaseContext = {
   session: Session | null;
@@ -31,6 +32,7 @@ export default function SupabaseProvider({
   children: React.ReactNode;
 }) {
   const [session, _setSession] = useState<Session | null>(null);
+  const newUserMutation = trpc.user.create.useMutation();
 
   const setSession = (session: Session | null) => {
     syncWithCookies(session);
@@ -55,14 +57,20 @@ export default function SupabaseProvider({
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (mounted && session) return setSession(session);
-      // document.cookie = "supabase.access-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      if (mounted && session) setSession(session);
     }
 
     getInitialSession();
 
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
+
+      if (event == "SIGNED_IN" && session)
+        newUserMutation.mutate({
+          // id: session.user.id,
+          // email: session.user.email!,
+          jwt: session.access_token,
+        });
     });
 
     return () => {
