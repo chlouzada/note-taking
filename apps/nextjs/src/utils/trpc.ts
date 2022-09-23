@@ -43,8 +43,10 @@ export const trpc = createTRPCNext<AppRouter>({
               credentials: "omit",
             });
           },
-          headers: {
-            authorization: getAuthorization(),
+          headers() {
+            return {
+              authorization: getAuthorization(),
+            };
           },
         }),
       ],
