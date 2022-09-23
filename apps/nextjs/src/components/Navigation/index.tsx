@@ -33,18 +33,23 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const { noteId, setNoteId, notebookId } = useSelection();
   const [data, setData] = useState<Note[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
-  const listAnimatedRef = useListAnimation();
   const [filter, setFilter] = useState<string>("");
+  const listAnimatedRef = useListAnimation();
 
   const createMutation = trpc.note.create.useMutation({
+    // TODO: add optimistic update
     onSuccess: (data) => {
       setData((prev) => [...prev, data]);
     },
   });
 
   const deleteMutation = trpc.note.delete.useMutation({
-    onSuccess: (data) => {
-      setData((prev) => prev.filter((note) => note.id !== data.id));
+    onMutate: (id) => {
+      setData((prev) => prev.filter((note) => note.id !== id));
+      return { prev: data };
+    },
+    onError: (_err, _input, ctx) => {
+      setData(ctx?.prev ?? []);
     },
   });
 
