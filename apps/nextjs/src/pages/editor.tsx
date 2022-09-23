@@ -5,6 +5,8 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { GetServerSideProps } from "next";
 import { clientEnv } from "../env/schema.mjs";
+import { trpc } from "../utils/trpc";
+import { Loader } from "@mantine/core";
 
 const SelectionContext = createContext<{
   noteId?: string;
@@ -25,6 +27,8 @@ export default function EditorPage({
   const [notebookId, setNotebookId] = useState<string>();
   const [noteId, setNoteId] = useState<string>();
 
+  const { data } = trpc.notebook.all.useQuery();
+
   const value = {
     notebookId,
     setNotebookId,
@@ -37,8 +41,16 @@ export default function EditorPage({
       <div className="flex flex-col h-full">
         <Header />
         <div className="h-full grid grid-cols-7 overflow-auto">
-          <Navigation />
-          <Editor />
+          {data ? (
+            <>
+              <Navigation data={data} />
+              <Editor />
+            </>
+          ) : (
+            <div className="col-start-1 col-end-9 m-auto">
+              <Loader color="lime" variant="dots" />
+            </div>
+          )}
         </div>
         <Footer />
       </div>

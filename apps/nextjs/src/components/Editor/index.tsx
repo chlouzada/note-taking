@@ -6,6 +6,7 @@ import MdEditor from "react-markdown-editor-lite";
 
 import "react-markdown-editor-lite/lib/index.css";
 import "./styles.module.css";
+import { LoadingOverlay } from "@mantine/core";
 
 const useDebounce = (value: any, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -26,9 +27,11 @@ export function Editor() {
   const [height, setHeight] = useState(0);
   const { noteId } = useSelection();
   const ref = useRef<HTMLDivElement>(null);
-  const debounced = useDebounce(text, 500);
+  const debounced = useDebounce(text, 250);
 
-  const { data: note } = trpc.note.get.useQuery(noteId!, { enabled: !!noteId });
+  const { data, isLoading } = trpc.note.get.useQuery(noteId!, {
+    enabled: !!noteId,
+  });
   const update = trpc.note.update.useMutation();
 
   useEffect(() => {
@@ -41,14 +44,21 @@ export function Editor() {
   }, [debounced]);
 
   return (
-    <div ref={ref} className="col-start-3 col-end-8">
-      {note && (
+    <div ref={ref} className="col-start-3 col-end-8 relative">
+      {data && (
         <MdEditor
           syncScrollMode={["leftFollowRight", "rightFollowLeft"]}
           style={{ height }}
           renderHTML={(text: string) => parser.render(text)}
           onChange={({ text }) => setText(text)}
-          defaultValue={note.content}
+          defaultValue={data.content}
+        />
+      )}
+      {isLoading && (
+        <LoadingOverlay
+          transitionDuration={200}
+          loaderProps={{ size: "sm", color: "lime", variant: "dots" }}
+          visible
         />
       )}
     </div>

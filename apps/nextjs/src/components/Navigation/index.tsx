@@ -2,7 +2,10 @@ import { AppRouter } from "@note-taking/trpc";
 import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useState } from "react";
 import { useSelection } from "../../pages/editor";
-import { trpc } from "../../utils/trpc";
+
+export type NavigationProps = {
+  data: inferProcedureOutput<AppRouter["notebook"]["all"]>;
+};
 
 export type Notebook = inferProcedureOutput<
   AppRouter["notebook"]["all"]
@@ -66,21 +69,19 @@ export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
   );
 };
 
-export const Navigation = () => {
+export const Navigation = (props: NavigationProps) => {
   const { setNotebookId, notebookId, noteId, setNoteId } = useSelection();
 
-  const { data } = trpc.notebook.all.useQuery();
-
   useEffect(() => {
-    if (!notebookId) setNotebookId(data?.[0].id);
-    if (!noteId) setNoteId(data?.[0].notes[0]?.id);
-  }, [data]);
+    if (!notebookId) setNotebookId(props.data?.[0].id);
+    if (!noteId) setNoteId(props.data?.[0].notes[0]?.id);
+  }, [props.data]);
 
   return (
     <div className="col-start-1 col-end-3">
       <div className="flex h-full">
-        <CategoryView notebooks={data} />
-        <NotesView notes={data?.flatMap((n) => n.notes)} />
+        <CategoryView notebooks={props.data} />
+        <NotesView notes={props.data?.flatMap((n) => n.notes)} />
       </div>
     </div>
   );
