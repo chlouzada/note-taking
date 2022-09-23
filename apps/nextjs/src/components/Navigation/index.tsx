@@ -3,8 +3,8 @@ import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useRef, useState } from "react";
 import { useSelection } from "../../pages/editor";
 import { trpc } from "../../utils/trpc";
-import { ActionIcon } from "@mantine/core";
-import { Note } from "tabler-icons-react";
+import { ActionIcon, TextInput } from "@mantine/core";
+import { Filter, Note } from "tabler-icons-react";
 import { ArrowsSort } from "tabler-icons-react";
 import autoAnimate from "@formkit/auto-animate";
 
@@ -34,6 +34,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const [data, setData] = useState<Note[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const listAnimatedRef = useListAnimation();
+  const [filter, setFilter] = useState<string>("");
 
   const create = trpc.note.create.useMutation({
     onSuccess: (data) => {
@@ -55,26 +56,42 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     setNoteId(filtered?.[0]?.id);
   }, [notebookId]);
 
-  const sorted = data?.sort((a, b) => {
+  const renderData = data?.filter((note) =>
+    (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
+  ).sort((a, b) => {
     if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
     else return a.updatedAt < b.updatedAt ? 1 : -1;
   });
 
+
   return (
     <div className="w-1/2 bg-gray-200">
-      <div className="flex justify-between px-1">
-        <ActionIcon
-          variant="transparent"
-          onClick={() => setOrder((prev) => (prev == "asc" ? "desc" : "asc"))}
-        >
-          <ArrowsSort size={24} strokeWidth="1.5" color="black" />
-        </ActionIcon>
-        <ActionIcon variant="transparent" onClick={handleCreateNote}>
-          <Note size={24} strokeWidth="1.5" color="black" />
-        </ActionIcon>
+      <div className="flex flex-col gap-2 p-1">
+        <div className="flex justify-between">
+          <ActionIcon
+            variant="transparent"
+            onClick={() => setOrder((prev) => (prev == "asc" ? "desc" : "asc"))}
+          >
+            <ArrowsSort size={24} strokeWidth="1.5" color="black" />
+          </ActionIcon>
+
+          <ActionIcon variant="transparent" onClick={handleCreateNote}>
+            <Note size={24} strokeWidth="1.5" color="black" />
+          </ActionIcon>
+        </div>
+        <TextInput
+          aria-label="Filter"
+          placeholder="Filter"
+          icon={<Filter />}
+          variant="unstyled"
+          size="sm"
+          className="rounded bg-white"
+          value={filter}
+          onChange={(e) => setFilter(e.currentTarget.value)}
+        />
       </div>
       <ul className="list-none" ref={listAnimatedRef}>
-        {sorted?.map((n) => (
+        {renderData?.map((n) => (
           <li
             key={n.id}
             className={`list-none ${
