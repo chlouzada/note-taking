@@ -32,6 +32,7 @@ export function Editor() {
 
   const { data, isLoading } = trpc.note.get.useQuery(noteId!, {
     enabled: !!noteId,
+    cacheTime: 0,
   });
   const update = trpc.note.update.useMutation();
 
@@ -48,7 +49,7 @@ export function Editor() {
   }, [debounced]);
 
   return (
-    <div ref={ref} className="col-start-3 col-end-10 relative">
+    <div ref={ref} className="col-start-3 col-end-9 relative">
       {data && (
         <MdEditor
           syncScrollMode={["leftFollowRight", "rightFollowLeft"]}
@@ -58,13 +59,11 @@ export function Editor() {
           defaultValue={data.content}
         />
       )}
-      {isLoading && (
-        <LoadingOverlay
-          transitionDuration={200}
-          loaderProps={{ size: "sm", color: "lime", variant: "dots" }}
-          visible
-        />
-      )}
+      <LoadingOverlay
+        transitionDuration={250}
+        loaderProps={{ size: "sm", color: "lime", variant: "dots" }}
+        visible={isLoading}
+      />
     </div>
   );
 }

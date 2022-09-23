@@ -3,11 +3,13 @@ import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useRef, useState } from "react";
 import { useSelection } from "../../pages/editor";
 import { trpc } from "../../utils/trpc";
-import { ActionIcon, TextInput } from "@mantine/core";
+import { ActionIcon, Text, TextInput } from "@mantine/core";
 import { Filter, Note, X } from "tabler-icons-react";
 import { ArrowsSort } from "tabler-icons-react";
 import autoAnimate from "@formkit/auto-animate";
 import { useElementSize } from "@mantine/hooks";
+import moment from "moment";
+import classNames from "classnames";
 
 export type NavigationProps = {
   data: inferProcedureOutput<AppRouter["notebook"]["all"]>;
@@ -65,20 +67,18 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   };
 
   useEffect(() => {
-    const filtered = notes?.filter((note) => note.notebookId === notebookId);
+    const filtered = notes
+      ?.filter((note) => note.notebookId === notebookId)
+      .filter((note) =>
+        (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
+      )
+      .sort((a, b) => {
+        if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
+        else return a.updatedAt < b.updatedAt ? 1 : -1;
+      });
     setData(filtered ?? []);
     setNoteId(filtered?.[0]?.id);
   }, [notebookId]);
-
-  const render = data
-    ?.filter((note) =>
-      (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
-      else return a.updatedAt < b.updatedAt ? 1 : -1;
-    });
-
 
   return (
     <div className="w-3/5 h-full" ref={container.ref}>
@@ -111,18 +111,28 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
         ref={listAnimatedRef}
         style={{ height: container.height - toolbar.height }}
       >
-        {render?.map((n) => (
+        {data?.map((n) => (
           <li
             key={n.id}
-            className={`list-none flex justify-between items-center ${
-              noteId === n.id ? "bg-blue-400" : "bg-blue-200"
-            } p-2`}
+            className={classNames(
+              "list-none flex justify-between items-center p-2 border-b-[1px]",
+              { "bg-blue-400  shadow-inner": noteId === n.id }
+
+            )}
             onClick={(e) => {
               if (e.target instanceof SVGElement) return;
               setNoteId(n.id);
             }}
           >
-            <p>{n.title ?? "Untitled"}</p>
+            <div>
+              <Text size={"md"}>{n.title ?? "Untitled"}</Text>
+              <Text className="truncate" color={"gray"} size={"xs"}>
+                {n.content.replace(/[#*`]/g, "") ?? "Untitled"}
+              </Text>
+              <Text className="font-semibold" color="blue" size={"xs"}>
+                {moment(n.updatedAt).fromNow() ?? "Untitled"}
+              </Text>
+            </div>
             <ActionIcon size={"xs"} onClick={() => deleteMutation.mutate(n.id)}>
               <X />
             </ActionIcon>

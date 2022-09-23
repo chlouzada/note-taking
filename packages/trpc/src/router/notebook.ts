@@ -3,7 +3,7 @@ import { authedProcedure, t } from "../trpc";
 
 export const notebookRouter = t.router({
   all: authedProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.notebook.findMany({
+    const all =  await ctx.prisma.notebook.findMany({
       where: {
         userId: ctx.session.id,
       },
@@ -15,10 +15,19 @@ export const notebookRouter = t.router({
             createdAt: true,
             updatedAt: true,
             notebookId: true,
+            content: true,
           },
         },
       },
     });
+
+    return all.map((notebook) => ({
+      ...notebook,
+      notes: notebook.notes.map((note) => ({
+        ...note,
+        content: note.content.length > 50 ? note.content.slice(0, 50) + "..." : note.content,
+      })),
+    }));
   }),
 
   create: authedProcedure
