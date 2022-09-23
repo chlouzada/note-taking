@@ -81,7 +81,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
 
 
   return (
-    <div className="w-1/2 h-full" ref={container.ref}>
+    <div className="w-3/5 h-full" ref={container.ref}>
       <div className="flex flex-col gap-2 p-1" ref={toolbar.ref}>
         <div className="flex justify-between">
           <ActionIcon
@@ -137,7 +137,7 @@ export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
   const { setNotebookId, notebookId } = useSelection();
 
   return (
-    <div className="w-1/2 bg-blue-200">
+    <div className="w-2/5 bg-blue-200">
       <p>Categories</p>
       <div>
         <p>Notebooks</p>

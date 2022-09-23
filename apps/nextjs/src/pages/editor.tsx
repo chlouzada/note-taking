@@ -36,7 +36,7 @@ export default function EditorPage() {
     <SelectionContext.Provider value={value}>
       <div className="flex flex-col h-full">
         <Header />
-        <div className="h-full grid grid-cols-7">
+        <div className="h-full grid grid-cols-9">
           {data ? (
             <>
               <Navigation data={data} />
