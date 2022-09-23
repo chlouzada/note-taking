@@ -7,6 +7,7 @@ import { ActionIcon, TextInput } from "@mantine/core";
 import { Filter, Note, X } from "tabler-icons-react";
 import { ArrowsSort } from "tabler-icons-react";
 import autoAnimate from "@formkit/auto-animate";
+import { useElementSize } from "@mantine/hooks";
 
 export type NavigationProps = {
   data: inferProcedureOutput<AppRouter["notebook"]["all"]>;
@@ -35,6 +36,8 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [filter, setFilter] = useState<string>("");
   const listAnimatedRef = useListAnimation();
+  const container = useElementSize();
+  const toolbar = useElementSize();
 
   const createMutation = trpc.note.create.useMutation({
     // TODO: add optimistic update
@@ -67,7 +70,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     setNoteId(filtered?.[0]?.id);
   }, [notebookId]);
 
-  const renderData = data
+  const render = data
     ?.filter((note) =>
       (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
     )
@@ -76,9 +79,10 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
       else return a.updatedAt < b.updatedAt ? 1 : -1;
     });
 
+
   return (
-    <div className="w-1/2 bg-gray-200">
-      <div className="flex flex-col gap-2 p-1">
+    <div className="w-1/2 h-full" ref={container.ref}>
+      <div className="flex flex-col gap-2 p-1" ref={toolbar.ref}>
         <div className="flex justify-between">
           <ActionIcon
             variant="transparent"
@@ -102,8 +106,12 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
           onChange={(e) => setFilter(e.currentTarget.value)}
         />
       </div>
-      <ul className="list-none" ref={listAnimatedRef}>
-        {renderData?.map((n) => (
+      <ul
+        className="list-none overflow-auto"
+        ref={listAnimatedRef}
+        style={{ height: container.height - toolbar.height }}
+      >
+        {render?.map((n) => (
           <li
             key={n.id}
             className={`list-none flex justify-between items-center ${
@@ -126,7 +134,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
 };
 
 export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
-  const { setNotebookId, notebookId, setNoteId } = useSelection();
+  const { setNotebookId, notebookId } = useSelection();
 
   return (
     <div className="w-1/2 bg-blue-200">
@@ -153,15 +161,18 @@ export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
 
 export const Navigation = (props: NavigationProps) => {
   const { setNotebookId, notebookId, noteId, setNoteId } = useSelection();
+  const { ref, height } = useElementSize();
 
   useEffect(() => {
     if (!notebookId) setNotebookId(props.data?.[0].id);
     if (!noteId) setNoteId(props.data?.[0].notes[0]?.id);
   }, [props.data]);
 
+  console.log(height);
+
   return (
-    <div className="col-start-1 col-end-3">
-      <div className="flex h-full">
+    <div ref={ref} className="col-start-1 col-end-3">
+      <div className="flex" style={{ height }}>
         <CategoryView notebooks={props.data} />
         <NotesView notes={props.data?.flatMap((n) => n.notes)} />
       </div>

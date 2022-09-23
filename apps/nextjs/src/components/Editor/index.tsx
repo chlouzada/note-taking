@@ -6,6 +6,7 @@ import MdEditor from "react-markdown-editor-lite";
 
 import "react-markdown-editor-lite/lib/index.css";
 import { LoadingOverlay } from "@mantine/core";
+import { useElementSize } from "@mantine/hooks";
 
 const useDebounce = (value: any, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -23,19 +24,14 @@ const parser = new MarkdownIt(/* Markdown-it options */);
 
 export function Editor() {
   const [text, setText] = useState<string>();
-  const [height, setHeight] = useState(0);
   const { noteId } = useSelection();
-  const ref = useRef<HTMLDivElement>(null);
   const debounced = useDebounce(text, 250);
+  const { ref, height } = useElementSize();
 
   const { data, isLoading } = trpc.note.get.useQuery(noteId!, {
     enabled: !!noteId,
   });
   const update = trpc.note.update.useMutation();
-
-  useEffect(() => {
-    setHeight((ref.current as any)?.clientHeight);
-  }, []);
 
   useEffect(() => {
     if (!noteId) return;

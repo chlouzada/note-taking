@@ -19,11 +19,7 @@ export const useSelection = () => {
   return useContext(SelectionContext);
 };
 
-export default function EditorPage({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function EditorPage() {
   const [notebookId, setNotebookId] = useState<string>();
   const [noteId, setNoteId] = useState<string>();
 
@@ -40,7 +36,7 @@ export default function EditorPage({
     <SelectionContext.Provider value={value}>
       <div className="flex flex-col h-full">
         <Header />
-        <div className="h-full grid grid-cols-7 overflow-auto">
+        <div className="h-full grid grid-cols-7">
           {data ? (
             <>
               <Navigation data={data} />
