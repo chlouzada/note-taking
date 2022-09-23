@@ -54,4 +54,17 @@ export const noteRouter = t.router({
         data,
       });
     }),
+  delete: authedProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    // check if note is owned by user
+    const note = await ctx.prisma.note.findFirstOrThrow({
+      where: {
+        id: input,
+        userId: ctx.session.id,
+      },
+    });
+
+    return await ctx.prisma.note.delete({
+      where: { id: note.id },
+    });
+  }),
 });

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSelection } from "../../pages/editor";
 import { trpc } from "../../utils/trpc";
 import { ActionIcon, TextInput } from "@mantine/core";
-import { Filter, Note } from "tabler-icons-react";
+import { Filter, Note, X } from "tabler-icons-react";
 import { ArrowsSort } from "tabler-icons-react";
 import autoAnimate from "@formkit/auto-animate";
 
@@ -36,15 +36,21 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const listAnimatedRef = useListAnimation();
   const [filter, setFilter] = useState<string>("");
 
-  const create = trpc.note.create.useMutation({
+  const createMutation = trpc.note.create.useMutation({
     onSuccess: (data) => {
       setData((prev) => [...prev, data]);
     },
   });
 
+  const deleteMutation = trpc.note.delete.useMutation({
+    onSuccess: (data) => {
+      setData((prev) => prev.filter((note) => note.id !== data.id));
+    },
+  });
+
   const handleCreateNote = async () => {
     if (!notebookId) throw new Error("No notebook selected");
-    const data = await create.mutateAsync({
+    const data = await createMutation.mutateAsync({
       notebookId,
     });
     setNoteId(data.id);
@@ -56,13 +62,14 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     setNoteId(filtered?.[0]?.id);
   }, [notebookId]);
 
-  const renderData = data?.filter((note) =>
-    (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
-  ).sort((a, b) => {
-    if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
-    else return a.updatedAt < b.updatedAt ? 1 : -1;
-  });
-
+  const renderData = data
+    ?.filter((note) =>
+      (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
+      else return a.updatedAt < b.updatedAt ? 1 : -1;
+    });
 
   return (
     <div className="w-1/2 bg-gray-200">
@@ -94,12 +101,15 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
         {renderData?.map((n) => (
           <li
             key={n.id}
-            className={`list-none ${
+            className={`list-none flex justify-between items-center ${
               noteId === n.id ? "bg-blue-400" : "bg-blue-200"
             } p-2`}
             onClick={() => setNoteId(n.id)}
           >
-            {n.title ?? "Untitled"}
+            <p>{n.title ?? "Untitled"}</p>
+            <ActionIcon size={"xs"} onClick={() => deleteMutation.mutate(n.id)}>
+              <X />
+            </ActionIcon>
           </li>
         ))}
       </ul>
