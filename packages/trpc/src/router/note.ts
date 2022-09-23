@@ -11,11 +11,10 @@ export const noteRouter = t.router({
     });
   }),
   create: authedProcedure
-    .input(z.object({ title: z.string(), notebookId: z.string() }))
+    .input(z.object({ notebookId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.note.create({
         data: {
-          title: input.title,
           content: "",
           notebook: {
             connect: {

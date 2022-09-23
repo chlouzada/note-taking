@@ -2,11 +2,14 @@ import { AppRouter } from "@note-taking/trpc";
 import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useState } from "react";
 import { useSelection } from "../../pages/editor";
+import { trpc } from "../../utils/trpc";
+import { ActionIcon } from "@mantine/core";
+import { Note } from "tabler-icons-react";
+import { ArrowsSort } from "tabler-icons-react";
 
 export type NavigationProps = {
   data: inferProcedureOutput<AppRouter["notebook"]["all"]>;
 };
-
 export type Notebook = inferProcedureOutput<
   AppRouter["notebook"]["all"]
 >[number];
@@ -17,6 +20,21 @@ export type Note = inferProcedureOutput<
 export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const { noteId, setNoteId, notebookId } = useSelection();
   const [data, setData] = useState<Note[]>([]);
+  const [order, setOrder] = useState<"asc" | "desc">("desc");
+
+  const create = trpc.note.create.useMutation({
+    onSuccess: (data) => {
+      setData((prev) => [...prev, data]);
+    },
+  });
+
+  const handleCreateNote = async () => {
+    if (!notebookId) throw new Error("No notebook selected");
+    const data = await create.mutateAsync({
+      notebookId,
+    });
+    setNoteId(data.id);
+  };
 
   useEffect(() => {
     const filtered = notes?.filter((note) => note.notebookId === notebookId);
@@ -24,10 +42,26 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     setNoteId(filtered?.[0]?.id);
   }, [notebookId]);
 
+  const sorted = data?.sort((a, b) => {
+    if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
+    else return a.updatedAt < b.updatedAt ? 1 : -1;
+  });
+
   return (
     <div className="w-1/2 bg-gray-200">
+      <div className="flex justify-between px-1">
+        <ActionIcon
+          variant="transparent"
+          onClick={() => setOrder((prev) => (prev == "asc" ? "desc" : "asc"))}
+        >
+          <ArrowsSort size={24} strokeWidth="1.5" color="black" />
+        </ActionIcon>
+        <ActionIcon variant="transparent" onClick={handleCreateNote}>
+          <Note size={24} strokeWidth="1.5" color="black" />
+        </ActionIcon>
+      </div>
       <ul className="list-none">
-        {data?.map((n) => (
+        {sorted?.map((n) => (
           <li
             key={n.id}
             className={`list-none ${
@@ -35,7 +69,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
             } p-2`}
             onClick={() => setNoteId(n.id)}
           >
-            {n.title}
+            {n.title ?? "Untitled"}
           </li>
         ))}
       </ul>
