@@ -3,6 +3,8 @@ import { Editor } from "../components/Editor";
 import { Navigation } from "../components/Navigation";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import { GetServerSideProps } from "next";
+import { clientEnv } from "../env/schema.mjs";
 
 const SelectionContext = createContext<{
   noteId?: string;
@@ -43,3 +45,24 @@ export default function EditorPage({
     </SelectionContext.Provider>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { req } = context;
+
+  const cookies = req.headers.cookie;
+
+  if (
+    !cookies?.includes(`sb-${clientEnv.NEXT_PUBLIC_SUPABASE_REF}-access-token`)
+  ) {
+    return {
+      redirect: {
+        destination: "/signin",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};

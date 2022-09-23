@@ -1,5 +1,6 @@
 import { Session } from "@supabase/supabase-js";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { clientEnv } from "../env/schema.mjs";
 import { supabase } from "../utils/supabase-client";
 
 type SupabaseContext = {
@@ -14,12 +15,27 @@ export const useSupabase = () => {
   return useContext(SupabaseContext);
 };
 
+const syncWithCookies = (session: Session | null) => {
+  console.log("running sync with cookies", session);
+  const name = `sb-${clientEnv.NEXT_PUBLIC_SUPABASE_REF}-access-token`;
+  if (session) {
+    document.cookie = `${name}=${session.access_token}; path=/;`;
+  } else {
+    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+  }
+};
+
 export default function SupabaseProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, _setSession] = useState<Session | null>(null);
+
+  const setSession = (session: Session | null) => {
+    syncWithCookies(session);
+    _setSession(session);
+  };
 
   const signIn = async ({ email }: { email: string }) => {
     const { error } = await supabase.auth.signInWithOtp({
@@ -45,9 +61,9 @@ export default function SupabaseProvider({
 
     getInitialSession();
 
-    const { data } = supabase.auth.onAuthStateChange((_event, session) =>
-      setSession(session)
-    );
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
     return () => {
       mounted = false;

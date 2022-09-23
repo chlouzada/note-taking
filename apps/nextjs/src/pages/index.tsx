@@ -10,8 +10,6 @@ const Home: NextPage = () => {
   const { session, signOut } = useSupabase();
   const router = useRouter();
 
-  console.log(session)
-
   return (
     <>
       <Head>
@@ -28,9 +26,14 @@ const Home: NextPage = () => {
           </h1>
           <div className="w-52">
             {session ? (
-              <Button fullWidth onClick={signOut}>
-                Sign Out
-              </Button>
+              <>
+                <Button fullWidth onClick={signOut}>
+                  Sign Out
+                </Button>
+                <Button fullWidth onClick={() => router.push("/editor")}>
+                  Editor
+                </Button>
+              </>
             ) : (
               <Button fullWidth onClick={() => router.push("/signin")}>
                 Sign In

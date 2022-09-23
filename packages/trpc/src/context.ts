@@ -42,8 +42,6 @@ export const createContext = async (
       }
     : null;
 
-    console.log(session ? session.email : 'no session')
-
   return await createContextInner({ session });
 };
 
