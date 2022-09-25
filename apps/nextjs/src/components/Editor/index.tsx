@@ -57,6 +57,7 @@ export function Editor() {
           renderHTML={handleHTML}
           onChange={({ text }) => setText(text)}
           defaultValue={data.content}
+          htmlClass="prose"
         />
       )}
       <LoadingOverlay

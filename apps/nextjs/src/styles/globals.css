@@ -23,15 +23,3 @@ html, body, #__next {
   background: #666; 
 }
 
-.md__ul {
-  list-style: disc !important;
-}
-
-.md__ol {
-  list-style: decimal !important;
-}
-
-.md__h1 {
- margin: 16px 0 !important;
-}
-
