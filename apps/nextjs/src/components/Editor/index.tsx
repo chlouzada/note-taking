@@ -36,12 +36,7 @@ export function Editor() {
   });
   const update = trpc.note.update.useMutation();
 
-  const handleHTML = (text: string) => {
-    const html = parser.render(text);
-    return html.replace(/<[a-zA-Z]+(>|.*?[^?]>)/g, (match) => {
-      return match.replace(">", ` class="md__${match.replace(/<|>/g, "")}">`);
-    });
-  };
+  const handleHTML = (text: string) => parser.render(text);
 
   useEffect(() => {
     if (!noteId) return;
