@@ -44,7 +44,7 @@ export default function EditorPage() {
             </>
           ) : (
             <div className="col-start-1 col-end-9 m-auto">
-              <Loader color="lime" variant="dots" />
+              <Loader color="indigo" variant="dots" styles={{}} />
             </div>
           )}
         </div>

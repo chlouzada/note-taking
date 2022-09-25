@@ -57,12 +57,11 @@ export function Editor() {
           renderHTML={handleHTML}
           onChange={({ text }) => setText(text)}
           defaultValue={data.content}
-          htmlClass="prose"
+          htmlClass="prose max-w-none"
         />
       )}
       <LoadingOverlay
-        transitionDuration={250}
-        loaderProps={{ size: "sm", color: "lime", variant: "dots" }}
+        loaderProps={{ size: "sm", color: "indigo", variant: "dots" }}
         visible={isLoading}
       />
     </div>
