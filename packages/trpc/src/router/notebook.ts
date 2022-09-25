@@ -25,7 +25,7 @@ export const notebookRouter = t.router({
       ...notebook,
       notes: notebook.notes.map((note) => ({
         ...note,
-        content: note.content.length > 50 ? note.content.slice(0, 50) + "..." : note.content,
+        content: note.content.length > 30 ? note.content.slice(0, 30) + "..." : note.content,
       })),
     }));
   }),

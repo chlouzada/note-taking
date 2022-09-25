@@ -78,7 +78,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
       });
     setData(filtered ?? []);
     setNoteId(filtered?.[0]?.id);
-  }, [notebookId]);
+  }, [notebookId, order]);
 
   return (
     <div className="w-3/5 h-full" ref={container.ref}>
@@ -98,7 +98,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
         <input
           aria-label="Filter"
           placeholder="Filter"
-          className="input input-sm"
+          className="input input-sm input-secondary"
           // icon={<Filter  size={20}/>} // TODO: add icon to input
           value={filter}
           onChange={(e) => setFilter(e.currentTarget.value)}
@@ -115,8 +115,8 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
             <li
               key={n.id}
               className={classNames(
-                "list-none flex justify-between items-center p-2 border-b-[1px]",
-                { "bg-primary shadow-inner": isFocused }
+                "list-none flex justify-between items-center p-2 border-b-[1px] border-gray-400",
+                { "bg-neutral-focus shadow-inner ": isFocused }
               )}
               onClick={(e) => {
                 if (e.target instanceof SVGElement) return;
@@ -124,14 +124,17 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
               }}
             >
               <div className="flex flex-col w-full gap-1">
-                <p className={classNames("text-md", {"text-secondary font-bold": isFocused})}>{n.title ?? "Untitled"}</p>
                 <p
-                  className={classNames(
-                    "truncate overflow-hidden text-gray-400 text-xs",
-                    {
-                      "text-white": isFocused,
-                    }
-                  )}
+                  className={classNames("text-md", {
+                    "text-secondary font-bold": isFocused,
+                  })}
+                >
+                  {n.title ?? "Untitled"}
+                </p>
+                <p
+                  className={classNames("truncate overflow-hidden text-xs", {
+                    "text-white": isFocused,
+                  })}
                 >
                   {n.content.replace(/[#*`]/g, "") ?? "Untitled"}
                 </p>
@@ -161,24 +164,23 @@ export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
   const { setNotebookId, notebookId } = useSelection();
 
   return (
-    <div className="w-2/5 bg-blue-200">
-      <p>Categories</p>
-      <div>
-        <p>Notebooks</p>
-        <ul>
-          {notebooks?.map((notebook) => (
+    <div className="w-2/5">
+      <ul>
+        {notebooks?.map((notebook) => {
+          const isFocused = notebook.id === notebookId;
+          return (
             <li
               key={notebook.id}
-              className={`list-none ${
-                notebook.id === notebookId ? "bg-blue-400" : "bg-blue-200"
-              } p-2`}
+              className={classNames("p-2", {
+                "bg-neutral-focus shadow-inner": isFocused,
+              })}
               onClick={() => setNotebookId(notebook.id)}
             >
               {notebook.title}
             </li>
-          ))}
-        </ul>
-      </div>
+          );
+        })}
+      </ul>
     </div>
   );
 };
@@ -198,7 +200,9 @@ export const Navigation = (props: NavigationProps) => {
     <div ref={ref} className="col-start-1 col-end-3">
       <div className="flex" style={{ height }}>
         <CategoryView notebooks={props.data} />
+        <div className="border-l border-gray-600 shadow-2xl" />
         <NotesView notes={props.data?.flatMap((n) => n.notes)} />
+        <div className="border-l border-gray-600 shadow-2xl" />
       </div>
     </div>
   );

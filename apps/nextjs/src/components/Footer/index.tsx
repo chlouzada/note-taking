@@ -1,5 +1,5 @@
 export default function index() {
   return (
-    <footer className="footer items-center p-3 bg-neutral text-neutral-content z-50" />
+    <footer className="footer items-center p-3 bg-gray-600 text-neutral-content z-50" />
   );
 }

@@ -24,7 +24,7 @@ html, body, #__next {
 }
 
 .input {
-  @apply rounded input-bordered focus:outline-offset-0 
+  @apply rounded input-bordered focus:outline-offset-1
 }
 
 .btn {
