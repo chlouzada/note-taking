@@ -2,7 +2,6 @@ import type { NextPage } from "next";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Head from "next/head";
-import { Button } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useSupabase } from "../contexts/Supabase";
 
@@ -21,23 +20,24 @@ const Home: NextPage = () => {
       <>
         <Header />
         <main className="container flex flex-col items-center justify-center h-full p-4 mx-auto">
-          <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-gray-700 ">
+          <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-primary mb-32">
             Note Taking
           </h1>
           <div className="w-52">
             {session ? (
-              <>
-                <Button fullWidth onClick={signOut}>
-                  Sign Out
-                </Button>
-                <Button fullWidth onClick={() => router.push("/editor")}>
-                  Editor
-                </Button>
-              </>
+              <button
+                className="btn btn-primary w-full"
+                onClick={() => router.push("/editor")}
+              >
+                Go To Editor
+              </button>
             ) : (
-              <Button fullWidth onClick={() => router.push("/signin")}>
+              <button
+                className="btn w-full"
+                onClick={() => router.push("/signin")}
+              >
                 Sign In
-              </Button>
+              </button>
             )}
           </div>
         </main>

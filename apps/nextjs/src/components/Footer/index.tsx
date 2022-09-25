@@ -1,8 +1,5 @@
-import { Footer } from '@mantine/core'
-import React from 'react'
-
 export default function index() {
   return (
-    <Footer height={28}> </Footer>
-  )
+    <footer className="footer items-center p-3 bg-neutral text-neutral-content" />
+  );
 }

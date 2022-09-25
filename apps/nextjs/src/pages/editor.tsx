@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { Editor } from "../components/Editor";
 import { Navigation } from "../components/Navigation";
 import Footer from "../components/Footer";

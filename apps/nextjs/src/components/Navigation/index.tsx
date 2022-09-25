@@ -3,7 +3,7 @@ import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useRef, useState } from "react";
 import { useSelection } from "../../pages/editor";
 import { trpc } from "../../utils/trpc";
-import { ActionIcon, Text, TextInput } from "@mantine/core";
+import { ActionIcon } from "@mantine/core";
 import { Filter, Note, X } from "tabler-icons-react";
 import { ArrowsSort } from "tabler-icons-react";
 import autoAnimate from "@formkit/auto-animate";
@@ -82,26 +82,24 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
 
   return (
     <div className="w-3/5 h-full" ref={container.ref}>
-      <div className="flex flex-col gap-2 p-1" ref={toolbar.ref}>
+      <div className="flex flex-col gap-2 p-1 mb-1" ref={toolbar.ref}>
         <div className="flex justify-between">
           <ActionIcon
             variant="transparent"
             onClick={() => setOrder((prev) => (prev == "asc" ? "desc" : "asc"))}
           >
-            <ArrowsSort size={24} strokeWidth="1.5" color="black" />
+            <ArrowsSort size={20} strokeWidth="1.5" color="black" />
           </ActionIcon>
 
           <ActionIcon variant="transparent" onClick={handleCreateNote}>
-            <Note size={24} strokeWidth="1.5" color="black" />
+            <Note size={20} strokeWidth="1.5" color="black" />
           </ActionIcon>
         </div>
-        <TextInput
+        <input
           aria-label="Filter"
           placeholder="Filter"
-          icon={<Filter />}
-          variant="unstyled"
-          size="sm"
-          className="rounded bg-white"
+          className="input input-sm"
+          // icon={<Filter  size={20}/>} // TODO: add icon to input
           value={filter}
           onChange={(e) => setFilter(e.currentTarget.value)}
         />
@@ -117,7 +115,6 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
             className={classNames(
               "list-none flex justify-between items-center p-2 border-b-[1px]",
               { "bg-blue-400  shadow-inner": noteId === n.id }
-
             )}
             onClick={(e) => {
               if (e.target instanceof SVGElement) return;
@@ -125,13 +122,13 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
             }}
           >
             <div>
-              <Text size={"md"}>{n.title ?? "Untitled"}</Text>
-              <Text className="truncate" color={"gray"} size={"xs"}>
+              <p className="text-md">{n.title ?? "Untitled"}</p>
+              <p className="truncate text-gray-400 text-xs">
                 {n.content.replace(/[#*`]/g, "") ?? "Untitled"}
-              </Text>
-              <Text className="font-semibold" color="blue" size={"xs"}>
+              </p>
+              <p className="font-semibold text-blue-400 text-xs">
                 {moment(n.updatedAt).fromNow() ?? "Untitled"}
-              </Text>
+              </p>
             </div>
             <ActionIcon size={"xs"} onClick={() => deleteMutation.mutate(n.id)}>
               <X />

@@ -16,7 +16,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
   }, []);
 
   return (
-    <MantineProvider emotionCache={myCache} withGlobalStyles withNormalizeCSS>
+    <MantineProvider>
       <SupabaseProvider>
         <Component {...pageProps} />
       </SupabaseProvider>

@@ -23,3 +23,10 @@ html, body, #__next {
   background: #666; 
 }
 
+.input {
+  @apply rounded input-bordered focus:outline-offset-0 
+}
+
+.btn {
+  @apply rounded
+}

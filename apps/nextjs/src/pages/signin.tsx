@@ -5,7 +5,7 @@ import { AuthError } from "@supabase/supabase-js";
 import classNames from "classnames";
 import { useSupabase } from "../contexts/Supabase";
 import { useRouter } from "next/router";
-import { Button, Divider, TextInput } from "@mantine/core";
+import { Divider, TextInput } from "@mantine/core";
 import { useEffect } from "react";
 
 export default function SignInPage() {
@@ -31,30 +31,21 @@ export default function SignInPage() {
           }}
           className="flex flex-col"
         >
-          <TextInput
+          <input
+            // TODO: ICON @
             required
             type="email"
             placeholder="Your email"
-            className="input input-bordered w-full"
-            icon={<At size={16} />}
+            className="input"
             {...register("email", { required: true })}
           />
-          <Button
-            type="submit"
-            disabled={submit.isSuccess}
-            fullWidth
-            className="mt-4"
-            // className={classNames(
-            //   "btn btn-primary w-full transition-all duration-200 mt-4",
-            //   { loading: submit.isLoading }
-            // )}
-          >
+          <button disabled={submit.isSuccess} className="btn w-full mt-4">
             {submit.isSuccess
               ? "Check Email"
               : submit.isLoading
               ? "Sending..."
               : "With Email"}
-          </Button>
+          </button>
           {submit.isError && (
             <span className="mt-2 text-red-500">
               {(submit.error as AuthError).message}
@@ -62,12 +53,12 @@ export default function SignInPage() {
           )}
         </form>
         <Divider />
-        <Button
+        <button
           onClick={() => google.mutate()}
           className="btn btn-primary w-full"
         >
           With Google
-        </Button>
+        </button>
       </div>
     </div>
   );
