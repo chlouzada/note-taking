@@ -2,20 +2,18 @@ import { z } from "zod";
 import { authedProcedure, t } from "../trpc";
 
 export const notebookRouter = t.router({
-  create: authedProcedure
-    .input(z.object({ title: z.string(), description: z.string().nullish() }))
-    .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.notebook.create({
-        data: {
-          ...input,
-          user: {
-            connect: {
-              id: ctx.session.id,
-            },
+  create: authedProcedure.mutation(async ({ ctx, input }) => {
+    return ctx.prisma.notebook.create({
+      data: {
+        title: "New Notebook",
+        user: {
+          connect: {
+            id: ctx.session.id,
           },
         },
-      });
-    }),
+      },
+    });
+  }),
 
   update: authedProcedure
     .input(

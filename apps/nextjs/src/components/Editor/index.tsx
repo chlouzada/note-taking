@@ -44,7 +44,7 @@ export function Editor() {
   }, [debounced]);
 
   return (
-    <div ref={ref} className="col-start-3 col-end-9 relative">
+    <div ref={ref} className="col-start-4 col-end-9 relative">
       {data && (
         <MdEditor
           syncScrollMode={["leftFollowRight", "rightFollowLeft"]}

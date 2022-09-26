@@ -1,9 +1,7 @@
-import { AppRouter } from "@note-taking/trpc";
-import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "../../utils/trpc";
 import { ActionIcon } from "@mantine/core";
-import { Filter, Note, X } from "tabler-icons-react";
+import { Filter, Note, Notebook, Notes, Plus, Settings, X } from "tabler-icons-react";
 import { ArrowsSort } from "tabler-icons-react";
 import autoAnimate from "@formkit/auto-animate";
 import { useElementSize } from "@mantine/hooks";
@@ -73,7 +71,9 @@ export const NotesView = () => {
 
   const render = data?.notes
     ?.filter((note) =>
-      selectedNotebookId ? note.notebookId === selectedNotebookId : true
+      selectedNotebookId !== "null"
+        ? note.notebookId === selectedNotebookId
+        : true
     )
     .filter((note) =>
       (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
@@ -163,14 +163,49 @@ export const NotesView = () => {
   );
 };
 
-export const CategoryView = () => {
+const AllNotes = () => {
   const { selectedNotebookId, setSelectedNotebookId } = useEditorStore();
-  const { data } = trpc.editor.useQuery(undefined, {
+
+  const selected = selectedNotebookId === "null";
+
+  return (
+    <div
+      className={classNames("flex justify-between items-center p-2", {
+        "bg-gray-500": selected, // TODO: better colors
+      })}
+    >
+      <div className="flex" onClick={() => setSelectedNotebookId("null")}>
+        <Notes className="mr-1" />
+        <p className="font-bold">All Notes</p>
+      </div>
+    </div>
+  );
+};
+
+const Notebooks = () => {
+  const { selectedNotebookId, setSelectedNotebookId } = useEditorStore();
+  const { data, refetch } = trpc.editor.useQuery(undefined, {
     staleTime: 1000 * 30,
   });
 
+  const create = trpc.notebook.create.useMutation({
+    // TODO: add optimistic update
+    onSettled: () => {
+      refetch();
+    },
+  });
+
   return (
-    <div className="w-2/5">
+    <div className="flex flex-col gap-1">
+      <div className="flex justify-between items-center px-2">
+        <div className="flex">
+          <Notebook className="mr-1" />
+          <p className="font-bold">Notebooks</p>
+        </div>
+        <ActionIcon variant="transparent" onClick={() => create.mutate()}>
+          <Plus color="white" />
+        </ActionIcon>
+      </div>
       <ul>
         {data?.notebooks.map((notebook) => {
           const isFocused = notebook.id === selectedNotebookId;
@@ -182,7 +217,8 @@ export const CategoryView = () => {
               })}
               onClick={() => setSelectedNotebookId(notebook.id)}
             >
-              {notebook.title}
+              {notebook.title} 
+              {/* <Settings/> // TODO: add settings to update notebook info */}
             </li>
           );
         })}
@@ -191,10 +227,21 @@ export const CategoryView = () => {
   );
 };
 
+export const CategoryView = () => {
+  return (
+    <div className="w-2/5 bg-gray-900 text-white">
+      <div className="flex flex-col gap-1">
+        <AllNotes />
+        <Notebooks />
+      </div>
+    </div>
+  );
+};
+
 export const Navigation = () => {
   const { ref, height } = useElementSize();
   return (
-    <div ref={ref} className="col-start-1 col-end-3">
+    <div ref={ref} className="col-start-1 col-end-4">
       <div className="flex" style={{ height }}>
         <CategoryView />
         <div className="border-l border-gray-600 shadow-2xl" />
