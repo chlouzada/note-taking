@@ -6,11 +6,27 @@ import { GetServerSideProps } from "next";
 import { clientEnv } from "../env/schema.mjs";
 import { trpc } from "../utils/trpc";
 import { Loader } from "@mantine/core";
+import { useEditorStore } from "../stores/editor";
 
 export default function EditorPage() {
-  const { isLoading } = trpc.editor.useQuery(undefined, {
+  const {
+    setSelectedNoteId,
+    setSelectedNotebookId,
+    selectedNoteId,
+    selectedNotebookId,
+  } = useEditorStore();
+
+  const { isLoading, data } = trpc.editor.useQuery(undefined, {
     staleTime: 1000 * 30,
   });
+
+  if (data) {
+    if (data.notebooks.length > 0 && !selectedNotebookId)
+      setSelectedNotebookId(data.notebooks[0].id);
+    if (data.notes.length > 0 && !selectedNoteId)
+      setSelectedNoteId(data.notes[0].id);
+  }
+
   return (
     <div className="flex flex-col h-full">
       <Header />

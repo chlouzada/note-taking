@@ -1,28 +1,21 @@
-import { authedProcedure, t } from "../trpc";
-import { z } from "zod";
+import { authedProcedure } from "../trpc";
 
 export const editorRouter = authedProcedure.query(async ({ ctx }) => {
   const notebooks = await ctx.prisma.notebook.findMany({
     where: {
       userId: ctx.session.id,
     },
-    include: {
-      notes: {
-        select: {
-          id: true,
-          title: true,
-          createdAt: true,
-          updatedAt: true,
-          notebookId: true,
-          content: true,
-        },
-      },
+    orderBy: {
+      updatedAt: "desc",
     },
   });
 
   const notes = await ctx.prisma.note.findMany({
     where: {
       userId: ctx.session.id,
+    },
+    orderBy: {
+      updatedAt: "desc",
     },
   });
 
