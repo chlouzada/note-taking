@@ -10,6 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AuthError } from "@supabase/supabase-js";
 import { Divider } from "@mantine/core";
 import { useEffect } from "react";
+import Link from "next/link";
 
 const SignInView = () => {
   const router = useRouter();
@@ -24,7 +25,7 @@ const SignInView = () => {
   }, [session]);
 
   return (
-    <div className= "border shadow bg-white rounded-md p-4 w-full md:w-3/5 lg:w-2/5 xl:w-1/5 flex flex-col gap-4">
+    <div className="border shadow bg-white rounded-md p-4 w-full md:w-3/5 lg:w-2/5 xl:w-1/5 flex flex-col gap-4">
       <form
         onSubmit={(form) => {
           if (submit.isLoading) return;
@@ -65,9 +66,7 @@ const SignInView = () => {
 };
 
 const Home: NextPage = () => {
-  const { session, signOut } = useSupabase();
-  const router = useRouter();
-
+  const { session, isLoading } = useSupabase();
   return (
     <>
       <Head>
@@ -81,16 +80,14 @@ const Home: NextPage = () => {
           <h1 className="text-5xl md:text-[5rem] leading-normal font-extrabold text-primary mb-16">
             Note Taking
           </h1>
-          {session ? (
-            <button
-              className="btn btn-primary w-52"
-              onClick={() => router.push("/editor")}
-            >
-              Go To Editor
-            </button>
-          ) : (
-            <SignInView />
-          )}
+          {!isLoading &&
+            (session ? (
+              <Link href={"/editor"}>
+                <button className="btn btn-primary w-52"> Go To Editor</button>
+              </Link>
+            ) : (
+              <SignInView />
+            ))}
         </main>
       </>
     </>

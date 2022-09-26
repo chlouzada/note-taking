@@ -10,6 +10,7 @@ type SupabaseContext = {
   signIn: ({ email }: { email: string }) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  isLoading: boolean;
 };
 
 const SupabaseContext = createContext<SupabaseContext>(null!);
@@ -19,7 +20,6 @@ export const useSupabase = () => {
 };
 
 const syncWithCookies = (session: Session | null) => {
-  console.log("running sync with cookies", session);
   const name = `sb-${clientEnv.NEXT_PUBLIC_SUPABASE_REF}-access-token`;
   if (session) {
     document.cookie = `${name}=${session.access_token}; path=/;`;
@@ -34,6 +34,8 @@ export default function SupabaseProvider({
   children: React.ReactNode;
 }) {
   const [session, _setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const router = useRouter();
 
   const userCreate = trpc.user.create.useMutation();
@@ -65,11 +67,15 @@ export default function SupabaseProvider({
 
   useEffect(() => {
     let mounted = true;
+    setIsLoading(true);
     async function getInitialSession() {
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (mounted && session) setSession(session);
+      if (mounted && session) {
+        setSession(session);
+      }
+      setIsLoading(false);
     }
 
     getInitialSession();
@@ -79,8 +85,6 @@ export default function SupabaseProvider({
 
       if (event == "SIGNED_IN" && session)
         userCreate.mutate({
-          // id: session.user.id,
-          // email: session.user.email!,
           jwt: session.access_token,
         });
     });
@@ -96,6 +100,7 @@ export default function SupabaseProvider({
     signOut,
     signIn,
     signInWithGoogle,
+    isLoading,
   };
 
   return (
