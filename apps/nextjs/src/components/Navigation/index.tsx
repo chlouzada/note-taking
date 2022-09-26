@@ -1,7 +1,6 @@
 import { AppRouter } from "@note-taking/trpc";
 import { inferProcedureOutput } from "@trpc/server";
 import { useEffect, useRef, useState } from "react";
-import { useSelection } from "../../pages/editor";
 import { trpc } from "../../utils/trpc";
 import { ActionIcon } from "@mantine/core";
 import { Filter, Note, X } from "tabler-icons-react";
@@ -10,6 +9,7 @@ import autoAnimate from "@formkit/auto-animate";
 import { useElementSize } from "@mantine/hooks";
 import moment from "moment";
 import classNames from "classnames";
+import { useEditorStore } from "../../stores/editor";
 
 export type NavigationProps = {
   data: inferProcedureOutput<AppRouter["notebook"]["all"]>;
@@ -33,7 +33,12 @@ const useListAnimation = () => {
 };
 
 export const NotesView = ({ notes }: { notes?: Note[] }) => {
-  const { noteId, setNoteId, notebookId } = useSelection();
+  const { selectedNoteId, selectedNotebookId, setSelectedNoteId } =
+    useEditorStore();
+  const all = trpc.notebook.all.useQuery(undefined, {
+    staleTime: 1000 * 30,
+  });
+
   const [data, setData] = useState<Note[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [filter, setFilter] = useState<string>("");
@@ -42,9 +47,8 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   const toolbar = useElementSize();
 
   const createMutation = trpc.note.create.useMutation({
-    // TODO: add optimistic update
     onSuccess: (data) => {
-      setData((prev) => [...prev, data]);
+      all.refetch();
     },
   });
 
@@ -56,19 +60,23 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     onError: (_err, _input, ctx) => {
       setData(ctx?.prev ?? []);
     },
+    onSuccess: (data) => {
+      all.refetch();
+    },
   });
 
   const handleCreateNote = async () => {
-    if (!notebookId) throw new Error("No notebook selected");
+    if (!selectedNotebookId) throw new Error("No notebook selected");
     const data = await createMutation.mutateAsync({
-      notebookId,
+      notebookId: selectedNotebookId,
     });
-    setNoteId(data.id);
+    setSelectedNoteId(data.id);
   };
 
   useEffect(() => {
+    const notes = all.data?.flatMap((notebook) => notebook.notes) ?? [];
     const filtered = notes
-      ?.filter((note) => note.notebookId === notebookId)
+      ?.filter((note) => selectedNotebookId ? note.notebookId === selectedNotebookId : true)
       .filter((note) =>
         (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
       )
@@ -77,8 +85,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
         else return a.updatedAt < b.updatedAt ? 1 : -1;
       });
     setData(filtered ?? []);
-    setNoteId(filtered?.[0]?.id);
-  }, [notebookId, order]);
+  }, [selectedNotebookId, order]);
 
   return (
     <div className="w-3/5 h-full" ref={container.ref}>
@@ -110,7 +117,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
         style={{ height: container.height - toolbar.height }}
       >
         {data?.map((n) => {
-          const isFocused = n.id === noteId;
+          const isFocused = n.id === selectedNoteId;
           return (
             <li
               key={n.id}
@@ -120,7 +127,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
               )}
               onClick={(e) => {
                 if (e.target instanceof SVGElement) return;
-                setNoteId(n.id);
+                setSelectedNoteId(n.id);
               }}
             >
               <div className="flex flex-col w-full gap-1">
@@ -161,20 +168,25 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
 };
 
 export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
-  const { setNotebookId, notebookId } = useSelection();
+  const {
+    selectedNoteId,
+    selectedNotebookId,
+    setSelectedNoteId,
+    setSelectedNotebookId,
+  } = useEditorStore();
 
   return (
     <div className="w-2/5">
       <ul>
         {notebooks?.map((notebook) => {
-          const isFocused = notebook.id === notebookId;
+          const isFocused = notebook.id === selectedNotebookId;
           return (
             <li
               key={notebook.id}
               className={classNames("p-2", {
                 "bg-neutral-focus shadow-inner": isFocused,
               })}
-              onClick={() => setNotebookId(notebook.id)}
+              onClick={() => setSelectedNotebookId(notebook.id)}
             >
               {notebook.title}
             </li>
@@ -185,23 +197,14 @@ export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
   );
 };
 
-export const Navigation = (props: NavigationProps) => {
-  const { setNotebookId, notebookId, noteId, setNoteId } = useSelection();
+export const Navigation = () => {
   const { ref, height } = useElementSize();
-
-  useEffect(() => {
-    if (!notebookId) setNotebookId(props.data?.[0].id);
-    if (!noteId) setNoteId(props.data?.[0].notes[0]?.id);
-  }, [props.data]);
-
-  console.log(height);
-
   return (
     <div ref={ref} className="col-start-1 col-end-3">
       <div className="flex" style={{ height }}>
-        <CategoryView notebooks={props.data} />
+        <CategoryView />
         <div className="border-l border-gray-600 shadow-2xl" />
-        <NotesView notes={props.data?.flatMap((n) => n.notes)} />
+        <NotesView />
         <div className="border-l border-gray-600 shadow-2xl" />
       </div>
     </div>

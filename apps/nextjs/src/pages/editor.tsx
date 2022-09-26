@@ -1,4 +1,3 @@
-import { createContext, useContext, useState } from "react";
 import { Editor } from "../components/Editor";
 import { Navigation } from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -8,49 +7,27 @@ import { clientEnv } from "../env/schema.mjs";
 import { trpc } from "../utils/trpc";
 import { Loader } from "@mantine/core";
 
-const SelectionContext = createContext<{
-  noteId?: string;
-  setNoteId: (id?: string) => void;
-  notebookId?: string;
-  setNotebookId: (id?: string) => void;
-}>(null!);
-
-export const useSelection = () => {
-  return useContext(SelectionContext);
-};
-
 export default function EditorPage() {
-  const [notebookId, setNotebookId] = useState<string>();
-  const [noteId, setNoteId] = useState<string>();
-
-  const { data } = trpc.notebook.all.useQuery();
-
-  const value = {
-    notebookId,
-    setNotebookId,
-    noteId,
-    setNoteId,
-  };
-
+  const { isLoading } = trpc.notebook.all.useQuery(undefined, {
+    staleTime: 1000 * 30,
+  });
   return (
-    <SelectionContext.Provider value={value}>
-      <div className="flex flex-col h-full">
-        <Header />
-        <div className="h-full grid grid-cols-8">
-          {data ? (
-            <>
-              <Navigation data={data} />
-              <Editor />
-            </>
-          ) : (
-            <div className="col-start-1 col-end-9 m-auto">
-              <Loader color="indigo" variant="dots" styles={{}} />
-            </div>
-          )}
+    <div className="flex flex-col h-full">
+      <Header />
+      {isLoading ? (
+        <div className="col-start-1 col-end-9 m-auto">
+          <Loader color="indigo" variant="dots" />
         </div>
-        <Footer />
-      </div>
-    </SelectionContext.Provider>
+      ) : (
+        <>
+          <div className="h-full grid grid-cols-8">
+            <Navigation />
+            <Editor />
+          </div>
+          <Footer />
+        </>
+      )}
+    </div>
   );
 }
 

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { trpc } from "../../utils/trpc";
-import { useSelection } from "../../pages/editor";
 import MarkdownIt from "markdown-it";
 import MdEditor from "react-markdown-editor-lite";
 import { LoadingOverlay } from "@mantine/core";
 import { useElementSize } from "@mantine/hooks";
+import { useEditorStore } from "../../stores/editor";
 
 import "react-markdown-editor-lite/lib/index.css";
 
@@ -26,12 +26,12 @@ const parser = new MarkdownIt({
 
 export function Editor() {
   const [text, setText] = useState<string>();
-  const { noteId } = useSelection();
-  const debounced = useDebounce(text, 250);
+  const { selectedNoteId } = useEditorStore();
   const { ref, height } = useElementSize();
+  const debounced = useDebounce(text, 250);
 
-  const { data, isLoading } = trpc.note.get.useQuery(noteId!, {
-    enabled: !!noteId,
+  const { data, isLoading } = trpc.note.get.useQuery(selectedNoteId!, {
+    enabled: !!selectedNoteId,
     cacheTime: 0,
   });
   const update = trpc.note.update.useMutation();
@@ -39,8 +39,8 @@ export function Editor() {
   const handleHTML = (text: string) => parser.render(text);
 
   useEffect(() => {
-    if (!noteId) return;
-    update.mutate({ id: noteId!, data: { content: debounced } });
+    if (!selectedNoteId) return;
+    update.mutate({ id: selectedNoteId!, data: { content: debounced } });
   }, [debounced]);
 
   return (
