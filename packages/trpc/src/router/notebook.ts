@@ -2,34 +2,6 @@ import { z } from "zod";
 import { authedProcedure, t } from "../trpc";
 
 export const notebookRouter = t.router({
-  all: authedProcedure.query(async ({ ctx }) => {
-    const all =  await ctx.prisma.notebook.findMany({
-      where: {
-        userId: ctx.session.id,
-      },
-      include: {
-        notes: {
-          select: {
-            id: true,
-            title: true,
-            createdAt: true,
-            updatedAt: true,
-            notebookId: true,
-            content: true,
-          },
-        },
-      },
-    });
-
-    return all.map((notebook) => ({
-      ...notebook,
-      notes: notebook.notes.map((note) => ({
-        ...note,
-        content: note.content.length > 30 ? note.content.slice(0, 30) + "..." : note.content,
-      })),
-    }));
-  }),
-
   create: authedProcedure
     .input(z.object({ title: z.string(), description: z.string().nullish() }))
     .mutation(async ({ ctx, input }) => {

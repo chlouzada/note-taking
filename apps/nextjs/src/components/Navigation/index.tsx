@@ -11,16 +11,6 @@ import moment from "moment";
 import classNames from "classnames";
 import { useEditorStore } from "../../stores/editor";
 
-export type NavigationProps = {
-  data: inferProcedureOutput<AppRouter["notebook"]["all"]>;
-};
-export type Notebook = inferProcedureOutput<
-  AppRouter["notebook"]["all"]
->[number];
-export type Note = inferProcedureOutput<
-  AppRouter["notebook"]["all"]
->[number]["notes"][number];
-
 const useListAnimation = () => {
   const ref = useRef(null);
   useEffect(() => {
@@ -32,14 +22,14 @@ const useListAnimation = () => {
   return ref;
 };
 
-export const NotesView = ({ notes }: { notes?: Note[] }) => {
+export const NotesView = () => {
   const { selectedNoteId, selectedNotebookId, setSelectedNoteId } =
     useEditorStore();
-  const all = trpc.notebook.all.useQuery(undefined, {
+  const all = trpc.editor.useQuery(undefined, {
     staleTime: 1000 * 30,
   });
 
-  const [data, setData] = useState<Note[]>([]);
+  const [data, setData] = useState<any[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [filter, setFilter] = useState<string>("");
   const listAnimatedRef = useListAnimation();
@@ -60,7 +50,7 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
     onError: (_err, _input, ctx) => {
       setData(ctx?.prev ?? []);
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       all.refetch();
     },
   });
@@ -76,7 +66,9 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   useEffect(() => {
     const notes = all.data?.flatMap((notebook) => notebook.notes) ?? [];
     const filtered = notes
-      ?.filter((note) => selectedNotebookId ? note.notebookId === selectedNotebookId : true)
+      ?.filter((note) =>
+        selectedNotebookId ? note.notebookId === selectedNotebookId : true
+      )
       .filter((note) =>
         (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
       )
@@ -167,18 +159,16 @@ export const NotesView = ({ notes }: { notes?: Note[] }) => {
   );
 };
 
-export const CategoryView = ({ notebooks }: { notebooks?: Notebook[] }) => {
-  const {
-    selectedNoteId,
-    selectedNotebookId,
-    setSelectedNoteId,
-    setSelectedNotebookId,
-  } = useEditorStore();
+export const CategoryView = () => {
+  const { selectedNotebookId, setSelectedNotebookId } = useEditorStore();
+  const { data } = trpc.editor.useQuery(undefined, {
+    staleTime: 1000 * 30,
+  });
 
   return (
     <div className="w-2/5">
       <ul>
-        {notebooks?.map((notebook) => {
+        {data?.map((notebook) => {
           const isFocused = notebook.id === selectedNotebookId;
           return (
             <li
