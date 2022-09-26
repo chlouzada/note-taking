@@ -25,33 +25,32 @@ const useListAnimation = () => {
 export const NotesView = () => {
   const { selectedNoteId, selectedNotebookId, setSelectedNoteId } =
     useEditorStore();
-  const all = trpc.editor.useQuery(undefined, {
-    staleTime: 1000 * 30,
-  });
-
-  const [data, setData] = useState<any[]>([]);
   const [order, setOrder] = useState<"asc" | "desc">("desc");
   const [filter, setFilter] = useState<string>("");
   const listAnimatedRef = useListAnimation();
   const container = useElementSize();
   const toolbar = useElementSize();
 
+  const { data, refetch } = trpc.editor.useQuery(undefined, {
+    staleTime: 1000 * 30,
+  });
+
   const createMutation = trpc.note.create.useMutation({
-    onSuccess: (data) => {
-      all.refetch();
+    onSuccess: () => {
+      refetch();
     },
   });
 
   const deleteMutation = trpc.note.delete.useMutation({
     onMutate: (id) => {
-      setData((prev) => prev.filter((note) => note.id !== id));
+      // setData((prev) => prev.filter((note) => note.id !== id));
       return { prev: data };
     },
     onError: (_err, _input, ctx) => {
-      setData(ctx?.prev ?? []);
+      // setData(ctx?.prev ?? []);
     },
     onSuccess: () => {
-      all.refetch();
+      refetch();
     },
   });
 
@@ -63,21 +62,18 @@ export const NotesView = () => {
     setSelectedNoteId(data.id);
   };
 
-  useEffect(() => {
-    const notes = all.data?.flatMap((notebook) => notebook.notes) ?? [];
-    const filtered = notes
-      ?.filter((note) =>
-        selectedNotebookId ? note.notebookId === selectedNotebookId : true
-      )
-      .filter((note) =>
-        (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
-      )
-      .sort((a, b) => {
-        if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
-        else return a.updatedAt < b.updatedAt ? 1 : -1;
-      });
-    setData(filtered ?? []);
-  }, [selectedNotebookId, order]);
+  const notes = data?.flatMap((notebook) => notebook.notes) ?? [];
+  const render = notes
+    ?.filter((note) =>
+      selectedNotebookId ? note.notebookId === selectedNotebookId : true
+    )
+    .filter((note) =>
+      (note.title?.toLowerCase() ?? "untitled").includes(filter.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (order == "asc") return a.updatedAt > b.updatedAt ? 1 : -1;
+      else return a.updatedAt < b.updatedAt ? 1 : -1;
+    });
 
   return (
     <div className="w-3/5 h-full" ref={container.ref}>
@@ -108,7 +104,7 @@ export const NotesView = () => {
         ref={listAnimatedRef}
         style={{ height: container.height - toolbar.height }}
       >
-        {data?.map((n) => {
+        {render?.map((n) => {
           const isFocused = n.id === selectedNoteId;
           return (
             <li

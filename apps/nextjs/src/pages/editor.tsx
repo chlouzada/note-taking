@@ -8,7 +8,7 @@ import { trpc } from "../utils/trpc";
 import { Loader } from "@mantine/core";
 
 export default function EditorPage() {
-  const { isLoading } = trpc.notebook.all.useQuery(undefined, {
+  const { isLoading } = trpc.editor.useQuery(undefined, {
     staleTime: 1000 * 30,
   });
   return (
