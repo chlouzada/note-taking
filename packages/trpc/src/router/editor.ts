@@ -2,7 +2,7 @@ import { authedProcedure, t } from "../trpc";
 import { z } from "zod";
 
 export const editorRouter = authedProcedure.query(async ({ ctx }) => {
-  const all = await ctx.prisma.notebook.findMany({
+  const notebooks = await ctx.prisma.notebook.findMany({
     where: {
       userId: ctx.session.id,
     },
@@ -20,14 +20,20 @@ export const editorRouter = authedProcedure.query(async ({ ctx }) => {
     },
   });
 
-  return all.map((notebook) => ({
-    ...notebook,
-    notes: notebook.notes.map((note) => ({
+  const notes = await ctx.prisma.note.findMany({
+    where: {
+      userId: ctx.session.id,
+    },
+  });
+
+  return {
+    notebooks,
+    notes: notes.map((note) => ({
       ...note,
       content:
         note.content.length > 30
           ? note.content.slice(0, 30) + "..."
           : note.content,
     })),
-  }));
+  };
 });

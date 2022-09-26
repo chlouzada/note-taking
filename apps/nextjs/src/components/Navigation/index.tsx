@@ -10,6 +10,7 @@ import { useElementSize } from "@mantine/hooks";
 import moment from "moment";
 import classNames from "classnames";
 import { useEditorStore } from "../../stores/editor";
+import { useQueryClient } from "@tanstack/react-query";
 
 const useListAnimation = () => {
   const ref = useRef(null);
@@ -30,26 +31,34 @@ export const NotesView = () => {
   const listAnimatedRef = useListAnimation();
   const container = useElementSize();
   const toolbar = useElementSize();
+  const queryClient = useQueryClient();
 
   const { data, refetch } = trpc.editor.useQuery(undefined, {
     staleTime: 1000 * 30,
   });
 
   const createMutation = trpc.note.create.useMutation({
-    onSuccess: () => {
+    onSettled: () => {
       refetch();
     },
   });
 
   const deleteMutation = trpc.note.delete.useMutation({
-    onMutate: (id) => {
-      // setData((prev) => prev.filter((note) => note.id !== id));
-      return { prev: data };
+    onMutate: async (id) => {
+      await queryClient.cancelQueries(["editor"]);
+      const previous = queryClient.getQueryData(["editor"]);
+      queryClient.setQueryData(["editor"], (old: any) => {
+        return {
+          ...old,
+          notes: old.notes.filter((note: any) => note.id !== id),
+        };
+      });
+      return { previous };
     },
     onError: (_err, _input, ctx) => {
-      // setData(ctx?.prev ?? []);
+      queryClient.setQueryData(["editor"], ctx?.previous);
     },
-    onSuccess: () => {
+    onSettled: () => {
       refetch();
     },
   });
@@ -62,8 +71,7 @@ export const NotesView = () => {
     setSelectedNoteId(data.id);
   };
 
-  const notes = data?.flatMap((notebook) => notebook.notes) ?? [];
-  const render = notes
+  const render = data?.notes
     ?.filter((note) =>
       selectedNotebookId ? note.notebookId === selectedNotebookId : true
     )
@@ -164,7 +172,7 @@ export const CategoryView = () => {
   return (
     <div className="w-2/5">
       <ul>
-        {data?.map((notebook) => {
+        {data?.notebooks.map((notebook) => {
           const isFocused = notebook.id === selectedNotebookId;
           return (
             <li
